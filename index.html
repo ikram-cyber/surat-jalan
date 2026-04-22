@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Surat Jalan Pro | Heavy Logistics & ODOL Control</title>
+    <title>Surat Jalan Pro | National Standard Delivery Order</title>
     <meta name="theme-color" content="#1e3a8a">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #1e293b; -webkit-tap-highlight-color: transparent; }
@@ -24,20 +25,26 @@
         input:focus, select:focus, textarea:focus { border-color: #1e3a8a; box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1); }
         label { font-size: 11px; font-weight: 800; color: #475569; margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* Print Layout (A4 Corporate Standard) */
+        /* Print Layout (A4 Corporate Standard - ISO Compliant) */
         @media print {
-            body { background: white; padding: 0; margin: 0; font-size: 12pt; color: #000; }
+            body { background: white; padding: 0; margin: 0; font-size: 11pt; color: #000; }
             .no-print, .bottom-nav { display: none !important; }
             .page { display: block; }
             #p-home, #p-form, #p-seting { display: none !important; }
             #p-print { display: block !important; padding: 0; }
             
-            .print-header { border-bottom: 4px solid #1e3a8a; padding-bottom: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-            .print-title { font-size: 28px; font-weight: 900; color: #1e3a8a !important; margin: 0; text-transform: uppercase; letter-spacing: 2px; -webkit-print-color-adjust: exact; }
-            .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 10px; }
-            .print-table th, .print-table td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; font-size:11px; }
-            .print-table th { background-color: #f1f5f9 !important; font-weight: 800; -webkit-print-color-adjust: exact; }
-            .ttd-box { text-align: center; width: 30%; }
+            .print-header { border-bottom: 3px solid #000; padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-start; }
+            .print-title { font-size: 24px; font-weight: 900; color: #000 !important; margin: 0; text-transform: uppercase; letter-spacing: 2px; -webkit-print-color-adjust: exact; }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 10px; }
+            .print-table th, .print-table td { border: 1px solid #000; padding: 6px 8px; text-align: left; font-size: 11px; }
+            .print-table th { background-color: #f1f5f9 !important; font-weight: 800; -webkit-print-color-adjust: exact; text-transform: uppercase; }
+            .ttd-box { text-align: center; width: 30%; font-size: 11px; }
+            
+            /* Barcode specific sizing for print */
+            #pr-barcode { max-height: 45px; margin-top: 5px; }
+            
+            /* Terms and Conditions Text */
+            .legal-text { font-size: 8px; color: #475569; line-height: 1.4; border-top: 1px solid #000; padding-top: 5px; margin-top: 15px; }
         }
     </style>
 </head>
@@ -46,7 +53,7 @@
     <div class="bg-blue-900 text-white p-5 rounded-b-3xl shadow-lg relative overflow-hidden no-print">
         <div class="absolute -right-4 -top-4 text-8xl opacity-10"><i class="fas fa-truck-loading"></i></div>
         <h1 class="text-2xl font-black tracking-wide" id="h-pt">E-DELIVERY PRO</h1>
-        <p class="text-[10px] font-bold opacity-80 mt-1 tracking-widest uppercase">Heavy Logistics & ODOL Control</p>
+        <p class="text-[10px] font-bold opacity-80 mt-1 tracking-widest uppercase">National Standard Logistics System</p>
     </div>
 
     <div id="p-home" class="page active px-4 mt-5">
@@ -78,12 +85,6 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 mb-5 flex justify-center">
-            <div class="w-2/3 max-w-[200px]">
-                <canvas id="doChart"></canvas>
-            </div>
-        </div>
-
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="bg-slate-50 p-3 border-b border-slate-200 flex justify-between items-center">
                 <h3 class="font-black text-slate-700 text-xs uppercase tracking-wider"><i class="fas fa-list-ul mr-1"></i> Log Surat Jalan Terbaru</h3>
@@ -91,7 +92,7 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-xs text-left">
                     <thead class="bg-slate-100 text-slate-500 uppercase font-black text-[9px]">
-                        <tr><th class="p-3">No. DO / Tgl</th><th class="p-3">Tujuan</th><th class="p-3 text-center">Status</th><th class="p-3 text-center">Aksi</th></tr>
+                        <tr><th class="p-3">No. DO & Ref</th><th class="p-3">Tujuan</th><th class="p-3 text-center">Status</th><th class="p-3 text-center">Aksi</th></tr>
                     </thead>
                     <tbody id="table-dash" class="divide-y divide-slate-100">
                         </tbody>
@@ -108,15 +109,20 @@
             </div>
             
             <div class="grid grid-cols-2 gap-3 mb-3">
-                <div><label>Nomor DO</label><input type="text" id="f-no" placeholder="DO-2026-001" class="font-bold text-blue-900"></div>
+                <div><label>Nomor Surat Jalan (DO)</label><input type="text" id="f-no" placeholder="DO-2026-001" class="font-bold text-blue-900"></div>
                 <div><label>Tanggal</label><input type="date" id="f-tgl"></div>
             </div>
             
+            <div class="mb-3">
+                <label class="text-blue-700"><i class="fas fa-link"></i> Nomor Referensi / PO Pembeli</label>
+                <input type="text" id="f-po" placeholder="Contoh: PO/2026/XYZ/099 (Wajib untuk Penagihan)" class="bg-blue-50 border-blue-200">
+            </div>
+
             <div class="mb-3"><label>Tujuan / Proyek Penerima</label><input type="text" id="f-tujuan" placeholder="PT. Penerima / Proyek Tol"></div>
             <div class="mb-4"><label>Alamat Pengiriman</label><textarea id="f-alamat" rows="2" placeholder="Alamat lengkap tujuan..."></textarea></div>
             
             <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 mb-4">
-                <h4 class="font-black text-slate-700 text-[10px] uppercase tracking-wider mb-2"><i class="fas fa-truck-loading"></i> Manajemen Armada & JBI (Kemenhub)</h4>
+                <h4 class="font-black text-slate-700 text-[10px] uppercase tracking-wider mb-2"><i class="fas fa-truck-loading"></i> Pengangkut / Transporter</h4>
                 <div class="grid grid-cols-2 gap-3 mb-2">
                     <div><label>Nama Driver</label><input type="text" id="f-driver" placeholder="Nama Supir" class="!mb-0"></div>
                     <div><label>No. Polisi</label><input type="text" id="f-nopol" placeholder="B 1234 CD" class="!mb-0 font-bold uppercase"></div>
@@ -126,7 +132,7 @@
                     <select id="f-armada" class="font-bold text-blue-900" onchange="hitungKapasitas()">
                         <option value="Pickup|1000">Mobil Pickup / PU (Legal: Maks 1 Ton)</option>
                         <option value="Engkel|2500">Engkel / CDE (Legal: Maks 2.5 Ton)</option>
-                        <option value="CDD|5500">Double / CDD / Index 8 (Legal: Maks 5.5 Ton)</option>
+                        <option value="CDD|5500">Double / CDD (Legal: Maks 5.5 Ton)</option>
                         <option value="Fuso|10000">Fuso / Medium Dump (Legal: Maks 10 Ton)</option>
                         <option value="Tronton|15000">Tronton / Index 24 (Legal: Maks 15 Ton)</option>
                     </select>
@@ -134,7 +140,7 @@
                 
                 <div class="mt-2">
                     <div class="flex justify-between text-[9px] font-black uppercase text-slate-500 mb-1">
-                        <span>Load Utilization (Payload Fisik)</span>
+                        <span>Beban Fisik Terhadap Batas Legal</span>
                         <span id="load-text" class="text-emerald-600">0 Kg / 1000 Kg (0%)</span>
                     </div>
                     <div class="w-full bg-slate-300 rounded-full h-2.5 overflow-hidden">
@@ -146,8 +152,7 @@
             <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-4">
                 <div class="flex justify-between items-center mb-3">
                     <div>
-                        <label class="mb-0 text-blue-900">Material & Barang Bawaan</label>
-                        <p class="text-[9px] text-slate-500">Mesin konversi otomatis Kubikasi (m³) ke Kilogram.</p>
+                        <label class="mb-0 text-blue-900">Deskripsi Barang (Rincian Mutasi)</label>
                     </div>
                     <button class="bg-blue-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm" onclick="addItemRow()"><i class="fas fa-plus"></i> Tambah</button>
                 </div>
@@ -157,18 +162,17 @@
                         <button class="absolute top-2 right-2 text-red-500 p-2 hover:bg-red-50 rounded" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>
                         
                         <div class="mb-3 pr-6">
-                            <label class="text-[10px] text-slate-500 mb-1">Nama Barang / Deskripsi Material</label>
-                            <input type="text" placeholder="Contoh: Pasir Cor / Besi Beton" class="item-nama w-full !mb-0 !py-3">
+                            <label class="text-[10px] text-slate-500 mb-1">Nama Barang / Part Number</label>
+                            <input type="text" placeholder="Contoh: Mesin Pompa Air PX-99" class="item-nama w-full !mb-0 !py-3">
                         </div>
 
                         <div class="mb-3">
-                            <label class="text-[10px] text-slate-500 mb-1">Jenis Material (Otomatisasi Densitas)</label>
+                            <label class="text-[10px] text-slate-500 mb-1">Kalkulator Material Densitas (Opsional)</label>
                             <select class="item-mat w-full !mb-0 !py-3 text-[11px] font-bold bg-slate-50" onchange="autoHitungBerat(this)">
-                                <option value="1">Barang Umum (Manual Kg)</option>
-                                <option value="1500">Pasir Basah (± 1.500 Kg/m³)</option>
+                                <option value="1">Barang Umum (Isi Manual Kg)</option>
+                                <option value="1500">Pasir / Pasir Cor (± 1.500 Kg/m³)</option>
                                 <option value="1200">Tanah Urug (± 1.200 Kg/m³)</option>
                                 <option value="1400">Batu Split (± 1.400 Kg/m³)</option>
-                                <option value="2400">Beton Cor / Aspal (± 2.400 Kg/m³)</option>
                             </select>
                         </div>
 
@@ -184,13 +188,13 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="text-[10px] text-slate-500 mb-1 text-red-700 font-black">Total Berat (Kg)</label>
-                            <input type="number" placeholder="Beban dalam Kg" class="item-berat w-full !mb-0 !py-3 border-red-300 bg-red-50 font-black tracking-wide" oninput="hitungKapasitas()">
+                            <label class="text-[10px] text-slate-500 mb-1 text-red-700 font-black">Total Berat Aktual (Kg)</label>
+                            <input type="number" placeholder="Estimasi Berat" class="item-berat w-full !mb-0 !py-3 border-red-300 bg-red-50 font-black tracking-wide" oninput="hitungKapasitas()">
                         </div>
 
                         <div>
-                            <label class="text-[10px] text-slate-500 mb-1 text-emerald-700 font-black">Total Nilai / Harga (Rp)</label>
-                            <input type="number" placeholder="Contoh: 1000000000" class="item-nilai w-full !mb-0 !py-3 font-black text-emerald-900 border-emerald-300 bg-emerald-50 tracking-widest text-lg">
+                            <label class="text-[10px] text-slate-500 mb-1 text-emerald-700 font-black">Nilai Barang (Rp) - Disembunyikan saat cetak</label>
+                            <input type="number" placeholder="Contoh: 1000000" class="item-nilai w-full !mb-0 !py-3 font-black text-emerald-900 border-emerald-300 bg-emerald-50 tracking-widest text-lg">
                         </div>
                     </div>
                 </div>
@@ -205,25 +209,29 @@
 
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6" id="print-area">
             <div class="print-header">
-                <div>
+                <div class="w-1/2">
                     <h1 class="print-title" id="pr-pt">NAMA PERUSAHAAN</h1>
-                    <p class="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-wider">Heavy Logistics & Materials</p>
+                    <p class="text-[10px] font-bold text-slate-600 mt-1 uppercase">Shipper / Origin Facility</p>
                 </div>
-                <div class="text-right">
-                    <h2 class="text-2xl font-black text-slate-800 tracking-wider">SURAT JALAN</h2>
-                    <p class="text-sm font-bold text-slate-600" id="pr-no">DO-000</p>
+                <div class="w-1/2 text-right">
+                    <h2 class="text-xl font-black text-slate-800 tracking-wider">DELIVERY ORDER / SURAT JALAN</h2>
+                    <div class="flex justify-end mt-1 mb-1">
+                        <svg id="pr-barcode"></svg>
+                    </div>
+                    <p class="text-[11px] font-bold text-slate-600" id="pr-no">DO-000</p>
                 </div>
             </div>
 
-            <div class="flex justify-between mb-4 text-[12px]">
-                <div class="w-1/2 pr-4">
-                    <div class="font-black text-slate-500 text-[10px] uppercase mb-1">Kepada Yth:</div>
-                    <div class="font-black text-sm" id="pr-tujuan">PT Tujuan</div>
+            <div class="flex justify-between mb-4 text-[11px]">
+                <div class="w-1/2 pr-4 border-r border-slate-300">
+                    <div class="font-black text-slate-500 text-[10px] uppercase mb-1">Dikirim Kepada (Consignee):</div>
+                    <div class="font-black text-sm uppercase" id="pr-tujuan">PT Tujuan</div>
                     <div id="pr-alamat" class="mt-1 leading-relaxed">Alamat Tujuan</div>
                 </div>
-                <div class="w-1/3">
+                <div class="w-1/2 pl-4">
                     <table class="w-full text-[11px]">
-                        <tr><td class="font-bold py-1">Tanggal</td><td>: <span id="pr-tgl"></span></td></tr>
+                        <tr><td class="font-bold py-1 w-24">Tgl. Kirim</td><td>: <span id="pr-tgl"></span></td></tr>
+                        <tr><td class="font-bold py-1 text-blue-800">No. PO / Ref</td><td class="font-bold text-blue-800">: <span id="pr-po"></span></td></tr>
                         <tr><td class="font-bold py-1">Armada / Driver</td><td>: <span id="pr-armada"></span> / <span id="pr-driver"></span></td></tr>
                         <tr><td class="font-bold py-1">No. Polisi</td><td>: <span id="pr-nopol" class="uppercase font-bold"></span></td></tr>
                     </table>
@@ -233,50 +241,73 @@
             <table class="print-table">
                 <thead>
                     <tr>
-                        <th class="w-10 text-center">NO</th>
-                        <th>DESKRIPSI MATERIAL / BARANG</th>
-                        <th class="w-20 text-center">VOLUME</th>
-                        <th class="w-20 text-center">SATUAN</th>
-                        <th class="w-24 text-center">BERAT (KG)</th>
+                        <th class="w-8 text-center">NO</th>
+                        <th>NAMA BARANG / DESKRIPSI (ITEM DESCRIPTION)</th>
+                        <th class="w-16 text-center">QTY</th>
+                        <th class="w-16 text-center">SATUAN</th>
+                        <th class="w-20 text-center">BERAT (KG)</th>
+                        <th class="w-24 text-center">KETERANGAN</th>
                     </tr>
                 </thead>
                 <tbody id="pr-items"></tbody>
                 <tfoot>
                     <tr class="bg-slate-50">
-                        <td colspan="4" class="text-right font-black uppercase text-[10px] py-2">Total Tonase Muatan Fisik:</td>
-                        <td class="text-center font-black text-sm py-2" id="pr-totalkg">0 Kg</td>
+                        <td colspan="4" class="text-right font-black uppercase text-[10px] py-1 border-slate-300">Total Muatan Fisik Estimasi:</td>
+                        <td class="text-center font-black text-xs py-1 border-slate-300" id="pr-totalkg">0 Kg</td>
+                        <td class="border-slate-300"></td>
                     </tr>
                 </tfoot>
             </table>
 
-            <div id="pr-odol" class="mb-6 p-2 border-2 rounded text-center font-black text-[11px] uppercase tracking-widest border-slate-300">
-                Memuat Status ODOL...
+            <div id="pr-odol" class="mb-4 mt-2 p-1 border rounded text-center font-black text-[9px] uppercase tracking-widest border-slate-300">
+                Memuat Status Kendaraan...
             </div>
 
-            <div class="flex justify-between items-end mt-8">
-                <div class="w-1/4 text-center">
-                    <img id="pr-qr" class="w-20 h-20 border-2 border-slate-800 p-1 mx-auto object-cover" src="" alt="QR Code">
-                    <div class="text-[7px] font-black mt-1 tracking-widest uppercase">Scan Verifikasi</div>
+            <div class="flex justify-between items-end mt-6">
+                <div class="w-1/5 text-center">
+                    <img id="pr-qr" class="w-16 h-16 border border-slate-800 p-1 mx-auto object-cover" src="" alt="QR Code">
+                    <div class="text-[6px] font-black mt-1 tracking-widest uppercase">E-Sign QR</div>
                 </div>
-                <div class="flex w-3/4 justify-around">
-                    <div class="ttd-box"><p class="font-bold text-[10px] mb-8">Gudang / Timbangan</p><div style="height:50px;"></div><p class="font-black text-xs border-t border-slate-400 pt-1" id="pr-admin">Admin</p></div>
-                    <div class="ttd-box"><p class="font-bold text-[10px] mb-8">Driver Pengangkut</p><div style="height:50px;"></div><p class="font-black text-xs border-t border-slate-400 pt-1" id="pr-driver-ttd">Driver</p></div>
-                    <div class="ttd-box"><p class="font-bold text-[10px] mb-8">Site / Penerima</p><div style="height:50px;"></div><p class="font-black text-xs border-t border-slate-400 pt-1" id="pr-tujuan-ttd">Tujuan</p></div>
+
+                <div class="flex w-4/5 justify-around">
+                    <div class="ttd-box">
+                        <p class="font-bold text-[10px] mb-6 uppercase">Dikeluarkan Oleh,<br><span class="text-[8px] font-normal text-slate-500">Shipper / Gudang</span></p>
+                        <div style="height:40px;"></div>
+                        <p class="font-black text-[11px] border-t border-slate-400 pt-1" id="pr-admin">Admin</p>
+                    </div>
+                    <div class="ttd-box">
+                        <p class="font-bold text-[10px] mb-6 uppercase">Dibawa Oleh,<br><span class="text-[8px] font-normal text-slate-500">Carrier / Driver</span></p>
+                        <div style="height:40px;"></div>
+                        <p class="font-black text-[11px] border-t border-slate-400 pt-1" id="pr-driver-ttd">Driver</p>
+                    </div>
+                    <div class="ttd-box">
+                        <p class="font-bold text-[10px] mb-6 uppercase">Diterima Oleh,<br><span class="text-[8px] font-normal text-slate-500">Consignee</span></p>
+                        <div style="height:40px;"></div>
+                        <p class="font-black text-[11px] border-t border-slate-400 pt-1" id="pr-tujuan-ttd">Tujuan</p>
+                    </div>
                 </div>
+            </div>
+            
+            <div class="legal-text print-only">
+                <b>SYARAT & KETENTUAN (TERMS & CONDITIONS):</b><br>
+                1. Surat jalan ini merupakan dokumen sah serah terima barang secara fisik. Pembeli/Penerima wajib melakukan pengecekan kualitas dan kuantitas barang pada saat serah terima di lokasi.<br>
+                2. Dengan ditandatanganinya dokumen ini oleh pihak Penerima, maka Hak Kepemilikan (Title of Ownership) dan Risiko atas kerusakan/kehilangan barang telah berpindah sepenuhnya kepada Pembeli.<br>
+                3. Segala bentuk komplain, klaim kerusakan (Defect), atau kekurangan jumlah barang (Shortage) tidak akan dilayani setelah armada pengangkut (Carrier) meninggalkan area pembongkaran.<br>
+                4. Dokumen ini terintegrasi dengan sistem E-Delivery Pro dan dilindungi menggunakan pengamanan QR Code & Barcode Sistem.
             </div>
         </div>
     </div>
 
     <div id="p-seting" class="page px-4 mt-5">
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-            <h3 class="font-black text-blue-900 text-sm uppercase tracking-wide border-b border-slate-100 pb-3 mb-4"><i class="fas fa-cogs"></i> Konfigurasi Sistem</h3>
+            <h3 class="font-black text-blue-900 text-sm uppercase tracking-wide border-b border-slate-100 pb-3 mb-4"><i class="fas fa-cogs"></i> Konfigurasi Perusahaan</h3>
             <label>Nama Perusahaan / Operasi Tambang</label>
             <input type="text" id="set-pt" placeholder="PT. Logistik Maju Jaya" class="mb-4">
-            <label>Nama Supervisor / Admin Timbangan</label>
+            <label>Nama Supervisor / Kepala Gudang</label>
             <input type="text" id="set-admin" placeholder="Budi Santoso">
-            <button class="w-full bg-blue-900 text-white font-bold py-3 rounded-lg mt-4" onclick="simpanSet()">UPDATE PENGATURAN</button>
+            <button class="w-full bg-blue-900 text-white font-bold py-3 rounded-lg mt-4" onclick="simpanSet()">UPDATE KONFIGURASI</button>
             <hr class="my-6 border-slate-200">
-            <button class="w-full bg-red-600 text-white font-black py-3 rounded-lg uppercase" onclick="if(confirm('HAPUS SELURUH ARSIP SURAT JALAN?')) { localStorage.clear(); location.reload(); }">⚠️ Factory Reset</button>
+            <button class="w-full bg-red-600 text-white font-black py-3 rounded-lg uppercase" onclick="if(confirm('HAPUS SELURUH ARSIP SURAT JALAN?')) { localStorage.clear(); location.reload(); }">⚠️ Format Database</button>
         </div>
     </div>
 
@@ -368,43 +399,21 @@
             row.className = "item-row bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative";
             row.innerHTML = `
                 <button class="absolute top-2 right-2 text-red-500 p-2 hover:bg-red-50 rounded" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>
-                
-                <div class="mb-3 pr-6">
-                    <label class="text-[10px] text-slate-500 mb-1">Nama Barang / Deskripsi Material</label>
-                    <input type="text" placeholder="Contoh: Pasir Cor / Besi Beton" class="item-nama w-full !mb-0 !py-3">
-                </div>
-
-                <div class="mb-3">
-                    <label class="text-[10px] text-slate-500 mb-1">Jenis Material (Otomatisasi Densitas)</label>
+                <div class="mb-3 pr-6"><label class="text-[10px] text-slate-500 mb-1">Nama Barang / Part Number</label><input type="text" placeholder="Contoh: Baja Tulangan" class="item-nama w-full !mb-0 !py-3"></div>
+                <div class="mb-3"><label class="text-[10px] text-slate-500 mb-1">Kalkulator Material Densitas</label>
                     <select class="item-mat w-full !mb-0 !py-3 text-[11px] font-bold bg-slate-50" onchange="autoHitungBerat(this)">
-                        <option value="1">Barang Umum (Manual Kg)</option>
-                        <option value="1500">Pasir Basah (± 1.500 Kg/m³)</option>
+                        <option value="1">Barang Umum (Isi Manual Kg)</option>
+                        <option value="1500">Pasir / Pasir Cor (± 1.500 Kg/m³)</option>
                         <option value="1200">Tanah Urug (± 1.200 Kg/m³)</option>
                         <option value="1400">Batu Split (± 1.400 Kg/m³)</option>
-                        <option value="2400">Beton Cor / Aspal (± 2.400 Kg/m³)</option>
                     </select>
                 </div>
-
                 <div class="grid grid-cols-2 gap-3 mb-3">
-                    <div>
-                        <label class="text-[10px] text-slate-500 mb-1">Qty / Volume</label>
-                        <input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-3 text-center font-bold text-lg" min="1" value="1" oninput="autoHitungBerat(this)">
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-slate-500 mb-1">Satuan</label>
-                        <input type="text" placeholder="Pcs/m3" class="item-sat w-full !mb-0 !py-3 text-center" value="Pcs">
-                    </div>
+                    <div><label class="text-[10px] text-slate-500 mb-1">Qty / Vol</label><input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-3 text-center font-bold text-lg" min="1" value="1" oninput="autoHitungBerat(this)"></div>
+                    <div><label class="text-[10px] text-slate-500 mb-1">Satuan</label><input type="text" placeholder="Pcs/m3" class="item-sat w-full !mb-0 !py-3 text-center" value="Pcs"></div>
                 </div>
-
-                <div class="mb-3">
-                    <label class="text-[10px] text-slate-500 mb-1 text-red-700 font-black">Total Berat (Kg)</label>
-                    <input type="number" placeholder="Beban dalam Kg" class="item-berat w-full !mb-0 !py-3 border-red-300 bg-red-50 font-black tracking-wide" oninput="hitungKapasitas()">
-                </div>
-
-                <div>
-                    <label class="text-[10px] text-slate-500 mb-1 text-emerald-700 font-black">Total Nilai / Harga (Rp)</label>
-                    <input type="number" placeholder="Contoh: 1000000000" class="item-nilai w-full !mb-0 !py-3 font-black text-emerald-900 border-emerald-300 bg-emerald-50 tracking-widest text-lg">
-                </div>
+                <div class="mb-3"><label class="text-[10px] text-slate-500 mb-1 text-red-700 font-black">Total Berat Aktual (Kg)</label><input type="number" placeholder="Estimasi Berat" class="item-berat w-full !mb-0 !py-3 text-center border-red-300 bg-red-50 font-black tracking-wide" oninput="hitungKapasitas()"></div>
+                <div><label class="text-[10px] text-slate-500 mb-1 text-emerald-700 font-black">Nilai Barang (Rp)</label><input type="number" placeholder="Contoh: 1000000" class="item-nilai w-full !mb-0 !py-3 font-black text-emerald-900 border-emerald-300 bg-emerald-50 tracking-widest text-lg"></div>
             `;
             container.appendChild(row);
         }
@@ -418,6 +427,7 @@
         function simpanDO() {
             let no = document.getElementById('f-no').value.trim();
             let tgl = document.getElementById('f-tgl').value;
+            let po = document.getElementById('f-po').value.trim() || "-";
             let tujuan = document.getElementById('f-tujuan').value.trim();
             let alamat = document.getElementById('f-alamat').value.trim();
             let driver = document.getElementById('f-driver').value.trim();
@@ -444,24 +454,25 @@
             
             let isOverload = totalKg > maxKapasitasArmada;
             if(isOverload) {
-                if(!confirm(`⚠️ PELANGGARAN JBI (ODOL)!\nMuatan ${totalKg.toLocaleString('id-ID')} Kg melebihi batas armada ${armadaInfo} (${maxKapasitasArmada.toLocaleString('id-ID')} Kg).\nRisiko ditilang di Jembatan Timbang. Tetap paksakan terbitkan Surat Jalan?`)) return;
+                if(!confirm(`⚠️ PELANGGARAN JBI (ODOL)!\nMuatan ${totalKg.toLocaleString('id-ID')} Kg melebihi batas armada ${armadaInfo} (${maxKapasitasArmada.toLocaleString('id-ID')} Kg).\nSangat berisiko. Tetap paksakan terbitkan Surat Jalan?`)) return;
             }
 
             let id = Date.now();
-            let data = { id, no, tgl, tujuan, alamat, driver, armada: armadaInfo, max_legal: maxKapasitasArmada, nopol, items, total_berat: totalKg, is_odol: isOverload, status: 'DIKIRIM' };
+            let data = { id, no, tgl, po, tujuan, alamat, driver, armada: armadaInfo, max_legal: maxKapasitasArmada, nopol, items, total_berat: totalKg, is_odol: isOverload, status: 'DIKIRIM', tgl_selesai: null };
             
             db_do.push(data);
             localStorage.setItem('sj_db', JSON.stringify(db_do));
             
-            document.getElementById('f-no').value = ""; document.getElementById('f-tujuan').value = ""; document.getElementById('f-alamat').value = ""; document.getElementById('f-driver').value = ""; document.getElementById('f-nopol').value = "";
+            // Reset Form (simpan sebagian info armada utk kemudahan)
+            document.getElementById('f-no').value = ""; document.getElementById('f-tujuan').value = ""; document.getElementById('f-alamat').value = ""; document.getElementById('f-po').value = "";
             document.getElementById('item-container').innerHTML = `
                 <div class="item-row bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative">
                     <button class="absolute top-2 right-2 text-red-500 p-2 hover:bg-red-50 rounded" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>
-                    <div class="mb-3 pr-6"><label class="text-[10px] text-slate-500 mb-1">Nama Barang / Deskripsi</label><input type="text" placeholder="Contoh: Pasir Cor" class="item-nama w-full !mb-0 !py-3"></div>
-                    <div class="mb-3"><label class="text-[10px] text-slate-500 mb-1">Jenis Material</label>
+                    <div class="mb-3 pr-6"><label class="text-[10px] text-slate-500 mb-1">Nama Barang / Part Number</label><input type="text" placeholder="Contoh: Baja Tulangan" class="item-nama w-full !mb-0 !py-3"></div>
+                    <div class="mb-3"><label class="text-[10px] text-slate-500 mb-1">Kalkulator Material Densitas</label>
                         <select class="item-mat w-full !mb-0 !py-3 text-[11px] font-bold bg-slate-50" onchange="autoHitungBerat(this)">
-                            <option value="1">Barang Umum (Manual Kg)</option>
-                            <option value="1500">Pasir Basah (± 1.500 Kg/m³)</option>
+                            <option value="1">Barang Umum (Isi Manual Kg)</option>
+                            <option value="1500">Pasir / Pasir Cor (± 1.500 Kg/m³)</option>
                             <option value="1200">Tanah Urug (± 1.200 Kg/m³)</option>
                             <option value="1400">Batu Split (± 1.400 Kg/m³)</option>
                         </select>
@@ -470,8 +481,8 @@
                         <div><label class="text-[10px] text-slate-500 mb-1">Qty / Vol</label><input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-3 text-center font-bold text-lg" min="1" value="1" oninput="autoHitungBerat(this)"></div>
                         <div><label class="text-[10px] text-slate-500 mb-1">Satuan</label><input type="text" placeholder="Pcs/m3" class="item-sat w-full !mb-0 !py-3 text-center" value="Pcs"></div>
                     </div>
-                    <div class="mb-3"><label class="text-[10px] text-slate-500 mb-1 text-red-700 font-black">Total Berat (Kg)</label><input type="number" placeholder="Kg" class="item-berat w-full !mb-0 !py-3 text-center border-red-300 bg-red-50 font-black tracking-wide" oninput="hitungKapasitas()"></div>
-                    <div><label class="text-[10px] text-slate-500 mb-1 text-emerald-700 font-black">Total Nilai / Harga (Rp)</label><input type="number" placeholder="Rp" class="item-nilai w-full !mb-0 !py-3 font-black text-emerald-900 border-emerald-300 bg-emerald-50 tracking-widest text-lg"></div>
+                    <div class="mb-3"><label class="text-[10px] text-slate-500 mb-1 text-red-700 font-black">Total Berat Aktual (Kg)</label><input type="number" placeholder="Estimasi Berat" class="item-berat w-full !mb-0 !py-3 text-center border-red-300 bg-red-50 font-black tracking-wide" oninput="hitungKapasitas()"></div>
+                    <div><label class="text-[10px] text-slate-500 mb-1 text-emerald-700 font-black">Nilai Barang (Rp)</label><input type="number" placeholder="Contoh: 1000000" class="item-nilai w-full !mb-0 !py-3 font-black text-emerald-900 border-emerald-300 bg-emerald-50 tracking-widest text-lg"></div>
                 </div>
             `;
             hitungKapasitas();
@@ -488,6 +499,7 @@
 
             document.getElementById('pr-pt').innerText = pt.toUpperCase();
             document.getElementById('pr-no').innerText = d.no;
+            document.getElementById('pr-po').innerText = d.po || '-';
             document.getElementById('pr-tujuan').innerText = d.tujuan;
             document.getElementById('pr-alamat').innerText = d.alamat;
             
@@ -505,7 +517,14 @@
                 let subKg = (it.berat || 0);
                 grandTotalKg += subKg;
                 let textKg = subKg > 0 ? `${subKg.toLocaleString('id-ID')} Kg` : '-';
-                htmlItems += `<tr><td class="text-center font-bold">${i+1}</td><td class="font-bold">${it.nama}</td><td class="text-center font-bold text-lg">${it.qty}</td><td class="text-center">${it.sat}</td><td class="text-center text-[10px] font-bold text-slate-600">${textKg}</td></tr>`;
+                htmlItems += `<tr>
+                    <td class="text-center font-bold">${i+1}</td>
+                    <td class="font-bold">${it.nama}</td>
+                    <td class="text-center font-bold text-sm">${it.qty}</td>
+                    <td class="text-center">${it.sat}</td>
+                    <td class="text-center font-bold">${textKg}</td>
+                    <td></td>
+                </tr>`;
             });
             document.getElementById('pr-items').innerHTML = htmlItems;
             document.getElementById('pr-totalkg').innerText = grandTotalKg > 0 ? grandTotalKg.toLocaleString('id-ID') + ' Kg' : '-';
@@ -513,21 +532,33 @@
             let divOdol = document.getElementById('pr-odol');
             if(d.is_odol) {
                 divOdol.innerHTML = `⚠️ DOKUMEN PERINGATAN: MUATAN ${grandTotalKg.toLocaleString('id-ID')} KG MELEBIHI BATAS LEGAL JBI ${(d.max_legal||0).toLocaleString('id-ID')} KG (OVERLOAD)`;
-                divOdol.className = "mb-6 p-2 border-2 rounded text-center font-black text-[11px] uppercase tracking-widest border-red-500 text-red-600 bg-red-50";
+                divOdol.className = "mb-4 mt-2 p-1 border rounded text-center font-black text-[9px] uppercase tracking-widest border-red-500 text-red-600 bg-red-50 print:border-black print:text-black";
             } else {
                 divOdol.innerHTML = `✅ DOKUMEN TERVALIDASI: MUATAN AMAN SESUAI REGULASI JBI KEMENHUB (BEBAS ODOL)`;
-                divOdol.className = "mb-6 p-2 border-2 rounded text-center font-black text-[11px] uppercase tracking-widest border-emerald-500 text-emerald-600 bg-emerald-50";
+                divOdol.className = "mb-4 mt-2 p-1 border rounded text-center font-black text-[9px] uppercase tracking-widest border-emerald-500 text-emerald-600 bg-emerald-50 print:border-black print:text-black";
             }
+
+            // GENERATE NATIVE BARCODE (CODE128)
+            try {
+                JsBarcode("#pr-barcode", d.no, {
+                    format: "CODE128",
+                    lineColor: "#0f172a",
+                    width: 1.5,
+                    height: 30,
+                    displayValue: false,
+                    margin: 0
+                });
+            } catch(e) { console.log("Barcode render error", e); }
 
             let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=VERIFY:${d.no}_${d.tujuan.replace(/\s+/g, '')}`;
             document.getElementById('pr-qr').src = qrUrl;
 
             let actionDiv = document.getElementById('action-buttons');
-            let btnSelesai = d.status === 'DIKIRIM' ? `<button class="flex-[1.5] bg-emerald-600 text-white py-2 rounded font-bold shadow-md" onclick="tandaiSelesai(${d.id})"><i class="fas fa-check"></i> Tandai Selesai</button>` : '';
+            let btnSelesai = d.status === 'DIKIRIM' ? `<button class="flex-[1.5] bg-emerald-600 text-white py-2 rounded font-bold shadow-md" onclick="tandaiSelesai(${d.id})"><i class="fas fa-check"></i> Tandai Selesai (e-POD)</button>` : '';
             
             actionDiv.innerHTML = `
                 <button class="flex-1 bg-slate-500 text-white py-2 rounded font-bold shadow-md" onclick="bukaTab('home')"><i class="fas fa-arrow-left"></i> Kembali</button>
-                <button class="flex-1 bg-blue-600 text-white py-2 rounded font-bold shadow-md" onclick="window.print()"><i class="fas fa-print"></i> Cetak A4</button>
+                <button class="flex-1 bg-blue-600 text-white py-2 rounded font-bold shadow-md" onclick="window.print()"><i class="fas fa-print"></i> Cetak DO Resmi</button>
                 ${btnSelesai}
             `;
 
@@ -535,12 +566,15 @@
         }
 
         function tandaiSelesai(id) {
-            if(confirm("Tandai Surat Jalan ini sudah selesai/diterima tujuan?")) {
+            let note = prompt("Catatan Penerima (Kondisi Barang saat dibongkar)? \nCth: Diterima dengan baik / Ada yang rusak 1", "Diterima dengan baik");
+            if(note !== null) {
                 let idx = db_do.findIndex(x => x.id === id);
                 if(idx > -1) {
                     db_do[idx].status = 'SELESAI';
+                    db_do[idx].tgl_selesai = new Date().toLocaleString('id-ID');
+                    db_do[idx].catatan_penerima = note;
                     localStorage.setItem('sj_db', JSON.stringify(db_do));
-                    alert("Status diubah menjadi Selesai!");
+                    alert("Status e-POD berhasil dikonfirmasi!");
                     lihatPrint(id); renderDash();
                 }
             }
@@ -582,10 +616,11 @@
             db_do.slice().sort((a,b)=>b.id-a.id).forEach(d => {
                 let badge = d.status === 'SELESAI' ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-[9px] font-black">SELESAI</span>' : '<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-[9px] font-black">DIKIRIM</span>';
                 let p = d.tgl.split('-');
-                let beratStr = d.total_berat ? `<br><span class="text-[9px] font-black ${d.is_odol ? 'text-red-500' : 'text-slate-400'}">⚖️ ${d.total_berat.toLocaleString('id-ID')} Kg ${d.is_odol ? '(ODOL)' : ''}</span>` : '';
-                
+                let beratStr = d.total_berat ? `<br><span class="text-[9px] font-black ${d.is_odol ? 'text-red-500' : 'text-slate-400'}">⚖️ ${d.total_berat.toLocaleString('id-ID')} Kg</span>` : '';
+                let refStr = d.po ? `<span class="text-[8px] text-blue-700 font-bold ml-1">Ref: ${d.po}</span>` : '';
+
                 html += `<tr class="hover:bg-slate-50 transition-colors">
-                    <td class="p-3"><div class="font-black text-blue-900">${d.no}</div><div class="text-[9px] text-slate-500">${p[2]}/${p[1]}/${p[0]}</div></td>
+                    <td class="p-3"><div class="font-black text-blue-900">${d.no}</div><div class="text-[9px] text-slate-500">${p[2]}/${p[1]}/${p[0]} ${refStr}</div></td>
                     <td class="p-3 font-bold">${d.tujuan}${beratStr}</td>
                     <td class="p-3 text-center">${badge}</td>
                     <td class="p-3 text-center"><button class="bg-blue-100 text-blue-700 px-3 py-1 rounded font-bold text-[10px] hover:bg-blue-600 hover:text-white transition-colors" onclick="lihatPrint(${d.id})">Buka</button></td>
