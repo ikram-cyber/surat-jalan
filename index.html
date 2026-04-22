@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Surat Jalan Pro | E-Delivery Order</title>
+    <title>Surat Jalan Pro | Heavy Logistics & ODOL Control</title>
     <meta name="theme-color" content="#1e3a8a">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -32,10 +32,10 @@
             #p-home, #p-form, #p-seting { display: none !important; }
             #p-print { display: block !important; padding: 0; }
             
-            .print-header { border-bottom: 4px solid #1e3a8a; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+            .print-header { border-bottom: 4px solid #1e3a8a; padding-bottom: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
             .print-title { font-size: 28px; font-weight: 900; color: #1e3a8a !important; margin: 0; text-transform: uppercase; letter-spacing: 2px; -webkit-print-color-adjust: exact; }
-            .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 10px; }
-            .print-table th, .print-table td { border: 1px solid #cbd5e1; padding: 10px 12px; text-align: left; }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 10px; }
+            .print-table th, .print-table td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; font-size:11px; }
             .print-table th { background-color: #f1f5f9 !important; font-weight: 800; -webkit-print-color-adjust: exact; }
             .ttd-box { text-align: center; width: 30%; }
         }
@@ -44,9 +44,9 @@
 <body class="pb-24">
 
     <div class="bg-blue-900 text-white p-5 rounded-b-3xl shadow-lg relative overflow-hidden no-print">
-        <div class="absolute -right-4 -top-4 text-8xl opacity-10"><i class="fas fa-truck-fast"></i></div>
+        <div class="absolute -right-4 -top-4 text-8xl opacity-10"><i class="fas fa-truck-loading"></i></div>
         <h1 class="text-2xl font-black tracking-wide" id="h-pt">E-DELIVERY PRO</h1>
-        <p class="text-[10px] font-bold opacity-80 mt-1 tracking-widest uppercase">Sistem Manajemen Surat Jalan</p>
+        <p class="text-[10px] font-bold opacity-80 mt-1 tracking-widest uppercase">Heavy Logistics & ODOL Control</p>
     </div>
 
     <div id="p-home" class="page active px-4 mt-5">
@@ -63,20 +63,18 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 mb-5">
-            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                <div>
-                    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Dikirim</div>
-                    <div class="text-xl font-black text-blue-900 mt-1" id="v-tot">0</div>
-                </div>
-                <div class="text-2xl text-blue-100"><i class="fas fa-truck"></i></div>
+        <div class="grid grid-cols-3 gap-2 mb-5">
+            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-center">
+                <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Dikirim</div>
+                <div class="text-xl font-black text-blue-900 mt-1" id="v-tot">0</div>
             </div>
-            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                <div>
-                    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Selesai</div>
-                    <div class="text-xl font-black text-emerald-600 mt-1" id="v-done">0</div>
-                </div>
-                <div class="text-2xl text-emerald-100"><i class="fas fa-check-circle"></i></div>
+            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-center">
+                <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Selesai</div>
+                <div class="text-xl font-black text-emerald-600 mt-1" id="v-done">0</div>
+            </div>
+            <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 shadow-sm text-center text-white">
+                <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Tot. Tonase</div>
+                <div class="text-xl font-black mt-1 text-white" id="v-tonase">0 Ton</div>
             </div>
         </div>
 
@@ -114,49 +112,74 @@
                 <div><label>Tanggal</label><input type="date" id="f-tgl"></div>
             </div>
             
-            <div class="mb-3"><label>Tujuan / Perusahaan Penerima</label><input type="text" id="f-tujuan" placeholder="PT. Penerima / Nama Toko"></div>
+            <div class="mb-3"><label>Tujuan / Proyek Penerima</label><input type="text" id="f-tujuan" placeholder="PT. Penerima / Proyek Tol"></div>
             <div class="mb-4"><label>Alamat Pengiriman</label><textarea id="f-alamat" rows="2" placeholder="Alamat lengkap tujuan..."></textarea></div>
             
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <div><label>Nama Driver</label><input type="text" id="f-driver" placeholder="Nama Supir"></div>
-                <div><label>No. Polisi Kendaraan</label><input type="text" id="f-nopol" placeholder="B 1234 CD"></div>
+            <div class="bg-slate-100 p-3 rounded-lg border border-slate-200 mb-4">
+                <h4 class="font-black text-slate-700 text-[10px] uppercase tracking-wider mb-2"><i class="fas fa-truck-loading"></i> Manajemen Armada & JBI (Kemenhub)</h4>
+                <div class="grid grid-cols-2 gap-3 mb-2">
+                    <div><label>Nama Driver</label><input type="text" id="f-driver" placeholder="Nama Supir" class="!mb-0"></div>
+                    <div><label>No. Polisi</label><input type="text" id="f-nopol" placeholder="B 1234 CD" class="!mb-0 font-bold uppercase"></div>
+                </div>
+                <div>
+                    <label>Jenis Armada (Batas Payload Legal JBI)</label>
+                    <select id="f-armada" class="font-bold text-blue-900" onchange="hitungKapasitas()">
+                        <option value="Pickup|1000">Mobil Pickup / PU (Legal: Maks 1 Ton)</option>
+                        <option value="Engkel|2500">Engkel / CDE (Legal: Maks 2.5 Ton)</option>
+                        <option value="CDD|5500">Double / CDD / Index 8 (Legal: Maks 5.5 Ton)</option>
+                        <option value="Fuso|10000">Fuso / Medium Dump (Legal: Maks 10 Ton)</option>
+                        <option value="Tronton|15000">Tronton / Index 24 (Legal: Maks 15 Ton)</option>
+                    </select>
+                </div>
+                
+                <div class="mt-2">
+                    <div class="flex justify-between text-[9px] font-black uppercase text-slate-500 mb-1">
+                        <span>Load Utilization (Payload Fisik)</span>
+                        <span id="load-text" class="text-emerald-600">0 Kg / 1000 Kg (0%)</span>
+                    </div>
+                    <div class="w-full bg-slate-300 rounded-full h-2.5 overflow-hidden">
+                        <div id="load-bar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
             </div>
 
             <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-4">
                 <div class="flex justify-between items-center mb-3">
                     <div>
-                        <label class="mb-0 text-blue-900">Daftar Barang Bawaan</label>
-                        <p class="text-[9px] text-slate-500">Nilai (Rp) disembunyikan saat dicetak.</p>
+                        <label class="mb-0 text-blue-900">Material & Barang Bawaan</label>
+                        <p class="text-[9px] text-slate-500">Mesin konversi otomatis Kubikasi (m³) ke Kilogram.</p>
                     </div>
                     <button class="bg-blue-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm" onclick="addItemRow()"><i class="fas fa-plus"></i> Tambah</button>
                 </div>
                 
                 <div id="item-container" class="space-y-3">
-                    
                     <div class="item-row bg-white p-3 rounded-lg border border-slate-200 shadow-sm relative">
                         <button class="absolute top-2 right-2 text-red-500 p-2 hover:bg-red-50 rounded" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>
                         
-                        <label class="text-[10px] text-slate-500 mb-1">Nama Barang / Deskripsi</label>
-                        <div class="pr-8 mb-2">
-                            <input type="text" placeholder="Contoh: Semen Gresik 50kg" class="item-nama w-full !mb-0 !py-2">
+                        <div class="grid grid-cols-2 gap-2 mb-2 pr-8">
+                            <div>
+                                <label class="text-[10px] text-slate-500 mb-1">Nama Barang</label>
+                                <input type="text" placeholder="Contoh: Pasir Cor" class="item-nama w-full !mb-0 !py-2">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-500 mb-1">Jenis Material (Densitas)</label>
+                                <select class="item-mat w-full !mb-0 !py-2 text-[10px] font-bold" onchange="autoHitungBerat(this)">
+                                    <option value="1">Barang Umum (Manual Kg)</option>
+                                    <option value="1500">Pasir Basah (± 1.500 Kg/m³)</option>
+                                    <option value="1200">Tanah Urug (± 1.200 Kg/m³)</option>
+                                    <option value="1400">Batu Split (± 1.400 Kg/m³)</option>
+                                    <option value="2400">Beton Cor / Aspal (± 2.400 Kg/m³)</option>
+                                </select>
+                            </div>
                         </div>
-                        
-                        <div class="grid grid-cols-3 gap-2">
-                            <div>
-                                <label class="text-[10px] text-slate-500 mb-1">Qty</label>
-                                <input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-2 text-center font-bold" min="1" value="1">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-500 mb-1">Satuan</label>
-                                <input type="text" placeholder="Pcs/Kg" class="item-sat w-full !mb-0 !py-2 text-center" value="Pcs">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-slate-500 mb-1">Nilai (Rp)</label>
-                                <input type="number" placeholder="Rp" class="item-nilai w-full !mb-0 !py-2 text-right">
-                            </div>
+
+                        <div class="grid grid-cols-4 gap-2">
+                            <div><label class="text-[10px] text-slate-500 mb-1">Qty / Vol</label><input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-2 text-center font-bold" min="1" value="1" oninput="autoHitungBerat(this)"></div>
+                            <div><label class="text-[10px] text-slate-500 mb-1">Satuan</label><input type="text" placeholder="Pcs/m3" class="item-sat w-full !mb-0 !py-2 text-center" value="Pcs"></div>
+                            <div><label class="text-[10px] text-slate-500 mb-1 text-red-700">Total Berat (Kg)</label><input type="number" placeholder="Kg" class="item-berat w-full !mb-0 !py-2 text-center border-red-300 bg-red-50 font-bold" oninput="hitungKapasitas()"></div>
+                            <div><label class="text-[10px] text-slate-500 mb-1">Nilai (Rp)</label><input type="number" placeholder="Rp" class="item-nilai w-full !mb-0 !py-2 text-right"></div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
 
@@ -165,14 +188,13 @@
     </div>
 
     <div id="p-print" class="page px-4 mt-5">
-        <div class="no-print flex gap-2 mb-4" id="action-buttons">
-            </div>
+        <div class="no-print flex gap-2 mb-4" id="action-buttons"></div>
 
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6" id="print-area">
             <div class="print-header">
                 <div>
                     <h1 class="print-title" id="pr-pt">NAMA PERUSAHAAN</h1>
-                    <p class="text-xs font-bold text-slate-500 mt-1">Sistem Logistik & Distribusi</p>
+                    <p class="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-wider">Heavy Logistics & Materials</p>
                 </div>
                 <div class="text-right">
                     <h2 class="text-2xl font-black text-slate-800 tracking-wider">SURAT JALAN</h2>
@@ -180,17 +202,17 @@
                 </div>
             </div>
 
-            <div class="flex justify-between mb-6 text-[13px]">
+            <div class="flex justify-between mb-4 text-[12px]">
                 <div class="w-1/2 pr-4">
                     <div class="font-black text-slate-500 text-[10px] uppercase mb-1">Kepada Yth:</div>
-                    <div class="font-black text-base" id="pr-tujuan">PT Tujuan</div>
+                    <div class="font-black text-sm" id="pr-tujuan">PT Tujuan</div>
                     <div id="pr-alamat" class="mt-1 leading-relaxed">Alamat Tujuan</div>
                 </div>
                 <div class="w-1/3">
-                    <table class="w-full text-[12px]">
+                    <table class="w-full text-[11px]">
                         <tr><td class="font-bold py-1">Tanggal</td><td>: <span id="pr-tgl"></span></td></tr>
-                        <tr><td class="font-bold py-1">Driver</td><td>: <span id="pr-driver"></span></td></tr>
-                        <tr><td class="font-bold py-1">No. Polisi</td><td>: <span id="pr-nopol"></span></td></tr>
+                        <tr><td class="font-bold py-1">Armada / Driver</td><td>: <span id="pr-armada"></span> / <span id="pr-driver"></span></td></tr>
+                        <tr><td class="font-bold py-1">No. Polisi</td><td>: <span id="pr-nopol" class="uppercase font-bold"></span></td></tr>
                     </table>
                 </div>
             </div>
@@ -198,38 +220,35 @@
             <table class="print-table">
                 <thead>
                     <tr>
-                        <th class="w-12 text-center">NO</th>
-                        <th>NAMA / DESKRIPSI BARANG</th>
-                        <th class="w-24 text-center">QTY</th>
-                        <th class="w-24 text-center">SATUAN</th>
+                        <th class="w-10 text-center">NO</th>
+                        <th>DESKRIPSI MATERIAL / BARANG</th>
+                        <th class="w-20 text-center">VOLUME</th>
+                        <th class="w-20 text-center">SATUAN</th>
+                        <th class="w-24 text-center">BERAT (KG)</th>
                     </tr>
                 </thead>
-                <tbody id="pr-items">
-                    </tbody>
+                <tbody id="pr-items"></tbody>
+                <tfoot>
+                    <tr class="bg-slate-50">
+                        <td colspan="4" class="text-right font-black uppercase text-[10px] py-2">Total Tonase Muatan Fisik:</td>
+                        <td class="text-center font-black text-sm py-2" id="pr-totalkg">0 Kg</td>
+                    </tr>
+                </tfoot>
             </table>
 
-            <div class="flex justify-between items-end mt-10">
-                <div class="w-1/4 text-center">
-                    <img id="pr-qr" class="w-24 h-24 border-2 border-slate-800 p-1 mx-auto object-cover" src="" alt="QR Code Verifikasi">
-                    <div class="text-[8px] font-black mt-1 tracking-widest uppercase">Scan Verifikasi</div>
-                </div>
+            <div id="pr-odol" class="mb-6 p-2 border-2 rounded text-center font-black text-[11px] uppercase tracking-widest border-slate-300">
+                Memuat Status ODOL...
+            </div>
 
+            <div class="flex justify-between items-end mt-8">
+                <div class="w-1/4 text-center">
+                    <img id="pr-qr" class="w-20 h-20 border-2 border-slate-800 p-1 mx-auto object-cover" src="" alt="QR Code">
+                    <div class="text-[7px] font-black mt-1 tracking-widest uppercase">Scan Verifikasi</div>
+                </div>
                 <div class="flex w-3/4 justify-around">
-                    <div class="ttd-box">
-                        <p class="font-bold text-xs mb-8">Pengirim (Gudang)</p>
-                        <div style="height:60px;"></div>
-                        <p class="font-black text-sm border-t border-slate-400 pt-1" id="pr-admin">Admin</p>
-                    </div>
-                    <div class="ttd-box">
-                        <p class="font-bold text-xs mb-8">Driver / Kurir</p>
-                        <div style="height:60px;"></div>
-                        <p class="font-black text-sm border-t border-slate-400 pt-1" id="pr-driver-ttd">Driver</p>
-                    </div>
-                    <div class="ttd-box">
-                        <p class="font-bold text-xs mb-8">Penerima</p>
-                        <div style="height:60px;"></div>
-                        <p class="font-black text-sm border-t border-slate-400 pt-1" id="pr-tujuan-ttd">Tujuan</p>
-                    </div>
+                    <div class="ttd-box"><p class="font-bold text-[10px] mb-8">Gudang / Timbangan</p><div style="height:50px;"></div><p class="font-black text-xs border-t border-slate-400 pt-1" id="pr-admin">Admin</p></div>
+                    <div class="ttd-box"><p class="font-bold text-[10px] mb-8">Driver Pengangkut</p><div style="height:50px;"></div><p class="font-black text-xs border-t border-slate-400 pt-1" id="pr-driver-ttd">Driver</p></div>
+                    <div class="ttd-box"><p class="font-bold text-[10px] mb-8">Site / Penerima</p><div style="height:50px;"></div><p class="font-black text-xs border-t border-slate-400 pt-1" id="pr-tujuan-ttd">Tujuan</p></div>
                 </div>
             </div>
         </div>
@@ -238,12 +257,11 @@
     <div id="p-seting" class="page px-4 mt-5">
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
             <h3 class="font-black text-blue-900 text-sm uppercase tracking-wide border-b border-slate-100 pb-3 mb-4"><i class="fas fa-cogs"></i> Konfigurasi Sistem</h3>
-            <label>Nama Perusahaan / Gudang Pengirim</label>
+            <label>Nama Perusahaan / Operasi Tambang</label>
             <input type="text" id="set-pt" placeholder="PT. Logistik Maju Jaya" class="mb-4">
-            <label>Nama Admin / Kepala Gudang</label>
+            <label>Nama Supervisor / Admin Timbangan</label>
             <input type="text" id="set-admin" placeholder="Budi Santoso">
             <button class="w-full bg-blue-900 text-white font-bold py-3 rounded-lg mt-4" onclick="simpanSet()">UPDATE PENGATURAN</button>
-            
             <hr class="my-6 border-slate-200">
             <button class="w-full bg-red-600 text-white font-black py-3 rounded-lg uppercase" onclick="if(confirm('HAPUS SELURUH ARSIP SURAT JALAN?')) { localStorage.clear(); location.reload(); }">⚠️ Factory Reset</button>
         </div>
@@ -258,7 +276,6 @@
     </nav>
 
     <script>
-        // DATABASE SCHEMA
         let db_do = JSON.parse(localStorage.getItem('sj_db')) || [];
         let curViewId = null;
         let chartInst = null;
@@ -281,30 +298,85 @@
             document.getElementById('f-no').value = `DO-${dateStr}-${count.toString().padStart(3,'0')}`;
         }
 
-        // Tampilan baru: Item Card Block
+        // NEW: MATERIAL DENSITY CALCULATOR
+        function autoHitungBerat(el) {
+            // Find the parent row
+            let row = el.closest('.item-row');
+            let typeMat = parseFloat(row.querySelector('.item-mat').value);
+            let inputQty = row.querySelector('.item-qty');
+            let inputSat = row.querySelector('.item-sat');
+            let inputBerat = row.querySelector('.item-berat');
+
+            if(typeMat === 1) {
+                // Barang Umum
+                inputBerat.readOnly = false;
+                inputBerat.classList.remove('bg-red-50');
+            } else {
+                // Material Konstruksi (Kubikasi)
+                let qty = parseFloat(inputQty.value) || 0;
+                inputSat.value = "m3"; // Set satuan otomatis ke Kubik
+                let totalKg = qty * typeMat;
+                inputBerat.value = totalKg;
+                inputBerat.readOnly = true;
+                inputBerat.classList.add('bg-red-50');
+            }
+            hitungKapasitas();
+        }
+
+        function hitungKapasitas() {
+            let armadaInfo = document.getElementById('f-armada').value.split('|');
+            let maxKg = parseInt(armadaInfo[1]) || 1000;
+            
+            let totalKg = 0;
+            document.querySelectorAll('.item-row').forEach(row => {
+                // Untuk berat, kita langsung ambil dari input berat karena sudah dikalikan kalau material khusus
+                let b = parseFloat(row.querySelector('.item-berat').value) || 0;
+                totalKg += b; 
+            });
+
+            let pct = (totalKg / maxKg) * 100;
+            let bar = document.getElementById('load-bar');
+            let txt = document.getElementById('load-text');
+
+            bar.style.width = (pct > 100 ? 100 : pct) + '%';
+            
+            if(pct <= 70) { 
+                bar.className = 'bg-emerald-500 h-2.5 rounded-full transition-all duration-500'; 
+                txt.style.color = '#059669'; 
+            } else if(pct <= 100) { 
+                bar.className = 'bg-amber-500 h-2.5 rounded-full transition-all duration-500'; 
+                txt.style.color = '#d97706'; 
+            } else { 
+                bar.className = 'bg-red-600 h-2.5 rounded-full transition-all duration-500 animate-pulse'; 
+                txt.style.color = '#dc2626'; 
+            }
+
+            txt.innerHTML = `<span class="font-black">${totalKg.toLocaleString('id-ID')} Kg</span> / ${maxKg.toLocaleString('id-ID')} Kg (${pct.toFixed(1)}%) ${pct > 100 ? ' ⚠️ OVERLOAD' : ''}`;
+        }
+
         function addItemRow() {
             const container = document.getElementById('item-container');
             const row = document.createElement('div');
             row.className = "item-row bg-white p-3 rounded-lg border border-slate-200 shadow-sm relative";
             row.innerHTML = `
                 <button class="absolute top-2 right-2 text-red-500 p-2 hover:bg-red-50 rounded" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>
-                <label class="text-[10px] text-slate-500 mb-1">Nama Barang / Deskripsi</label>
-                <div class="pr-8 mb-2">
-                    <input type="text" placeholder="Contoh: Semen Gresik 50kg" class="item-nama w-full !mb-0 !py-2">
+                <div class="grid grid-cols-2 gap-2 mb-2 pr-8">
+                    <div><label class="text-[10px] text-slate-500 mb-1">Nama Barang</label><input type="text" placeholder="Contoh: Pasir Cor" class="item-nama w-full !mb-0 !py-2"></div>
+                    <div><label class="text-[10px] text-slate-500 mb-1">Jenis Material</label>
+                        <select class="item-mat w-full !mb-0 !py-2 text-[10px] font-bold" onchange="autoHitungBerat(this)">
+                            <option value="1">Barang Umum (Manual Kg)</option>
+                            <option value="1500">Pasir Basah (± 1.500 Kg/m³)</option>
+                            <option value="1200">Tanah Urug (± 1.200 Kg/m³)</option>
+                            <option value="1400">Batu Split (± 1.400 Kg/m³)</option>
+                            <option value="2400">Beton Cor / Aspal (± 2.400 Kg/m³)</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="grid grid-cols-3 gap-2">
-                    <div>
-                        <label class="text-[10px] text-slate-500 mb-1">Qty</label>
-                        <input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-2 text-center font-bold" min="1" value="1">
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-slate-500 mb-1">Satuan</label>
-                        <input type="text" placeholder="Pcs/Kg" class="item-sat w-full !mb-0 !py-2 text-center" value="Pcs">
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-slate-500 mb-1">Nilai (Rp)</label>
-                        <input type="number" placeholder="Rp" class="item-nilai w-full !mb-0 !py-2 text-right">
-                    </div>
+                <div class="grid grid-cols-4 gap-2">
+                    <div><label class="text-[10px] text-slate-500 mb-1">Qty / Vol</label><input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-2 text-center font-bold" min="1" value="1" oninput="autoHitungBerat(this)"></div>
+                    <div><label class="text-[10px] text-slate-500 mb-1">Satuan</label><input type="text" placeholder="Pcs/m3" class="item-sat w-full !mb-0 !py-2 text-center" value="Pcs"></div>
+                    <div><label class="text-[10px] text-slate-500 mb-1 text-red-700">Total Berat (Kg)</label><input type="number" placeholder="Kg" class="item-berat w-full !mb-0 !py-2 text-center border-red-300 bg-red-50 font-bold" oninput="hitungKapasitas()"></div>
+                    <div><label class="text-[10px] text-slate-500 mb-1">Nilai (Rp)</label><input type="number" placeholder="Rp" class="item-nilai w-full !mb-0 !py-2 text-right"></div>
                 </div>
             `;
             container.appendChild(row);
@@ -312,11 +384,8 @@
 
         function hapusBaris(btn) {
             let rows = document.querySelectorAll('.item-row');
-            if(rows.length > 1) {
-                btn.parentElement.remove();
-            } else {
-                alert("Minimal harus ada 1 barang di Surat Jalan!");
-            }
+            if(rows.length > 1) { btn.parentElement.remove(); hitungKapasitas(); } 
+            else { alert("Minimal harus ada 1 barang di Surat Jalan!"); }
         }
 
         function simpanDO() {
@@ -326,52 +395,63 @@
             let alamat = document.getElementById('f-alamat').value.trim();
             let driver = document.getElementById('f-driver').value.trim();
             let nopol = document.getElementById('f-nopol').value.trim();
+            let armadaInfo = document.getElementById('f-armada').value.split('|')[0];
+            let maxKapasitasArmada = parseInt(document.getElementById('f-armada').value.split('|')[1]) || 1000;
 
             if(!no || !tujuan || !driver) return alert("Nomor DO, Tujuan, dan Driver wajib diisi!");
 
-            let items = [];
+            let items = []; let totalKg = 0; 
             document.querySelectorAll('.item-row').forEach(row => {
                 let nm = row.querySelector('.item-nama').value.trim();
-                let q = parseInt(row.querySelector('.item-qty').value) || 0;
+                let q = parseFloat(row.querySelector('.item-qty').value) || 0;
                 let s = row.querySelector('.item-sat').value.trim();
+                let b = parseFloat(row.querySelector('.item-berat').value) || 0;
                 let v = parseInt(row.querySelector('.item-nilai').value) || 0;
-                if(nm && q > 0) items.push({ nama: nm, qty: q, sat: s, nilai: v });
+                if(nm && q > 0) { 
+                    items.push({ nama: nm, qty: q, sat: s, berat: b, nilai: v }); 
+                    totalKg += b; // Berat sudah total dari item
+                }
             });
 
             if(items.length === 0) return alert("Minimal isi 1 barang yang valid!");
+            
+            // ODOL VALIDATION
+            let isOverload = totalKg > maxKapasitasArmada;
+            if(isOverload) {
+                if(!confirm(`⚠️ PELANGGARAN JBI (ODOL)!\nMuatan ${totalKg.toLocaleString('id-ID')} Kg melebihi batas armada ${armadaInfo} (${maxKapasitasArmada.toLocaleString('id-ID')} Kg).\nRisiko ditilang di Jembatan Timbang. Tetap paksakan terbitkan Surat Jalan?`)) return;
+            }
 
             let id = Date.now();
-            let data = { id, no, tgl, tujuan, alamat, driver, nopol, items, status: 'DIKIRIM' };
+            let data = { id, no, tgl, tujuan, alamat, driver, armada: armadaInfo, max_legal: maxKapasitasArmada, nopol, items, total_berat: totalKg, is_odol: isOverload, status: 'DIKIRIM' };
             
             db_do.push(data);
             localStorage.setItem('sj_db', JSON.stringify(db_do));
             
-            // Reset Form & Item Container back to 1 empty block
+            // Reset Form & Redirect
             document.getElementById('f-no').value = ""; document.getElementById('f-tujuan').value = ""; document.getElementById('f-alamat').value = ""; document.getElementById('f-driver').value = ""; document.getElementById('f-nopol').value = "";
             document.getElementById('item-container').innerHTML = `
                 <div class="item-row bg-white p-3 rounded-lg border border-slate-200 shadow-sm relative">
                     <button class="absolute top-2 right-2 text-red-500 p-2 hover:bg-red-50 rounded" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>
-                    <label class="text-[10px] text-slate-500 mb-1">Nama Barang / Deskripsi</label>
-                    <div class="pr-8 mb-2">
-                        <input type="text" placeholder="Contoh: Semen Gresik 50kg" class="item-nama w-full !mb-0 !py-2">
+                    <div class="grid grid-cols-2 gap-2 mb-2 pr-8">
+                        <div><label class="text-[10px] text-slate-500 mb-1">Nama Barang</label><input type="text" placeholder="Contoh: Pasir Cor" class="item-nama w-full !mb-0 !py-2"></div>
+                        <div><label class="text-[10px] text-slate-500 mb-1">Jenis Material</label>
+                            <select class="item-mat w-full !mb-0 !py-2 text-[10px] font-bold" onchange="autoHitungBerat(this)">
+                                <option value="1">Barang Umum (Manual Kg)</option>
+                                <option value="1500">Pasir Basah (± 1.500 Kg/m³)</option>
+                                <option value="1200">Tanah Urug (± 1.200 Kg/m³)</option>
+                                <option value="1400">Batu Split (± 1.400 Kg/m³)</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div>
-                            <label class="text-[10px] text-slate-500 mb-1">Qty</label>
-                            <input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-2 text-center font-bold" min="1" value="1">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-slate-500 mb-1">Satuan</label>
-                            <input type="text" placeholder="Pcs/Kg" class="item-sat w-full !mb-0 !py-2 text-center" value="Pcs">
-                        </div>
-                        <div>
-                            <label class="text-[10px] text-slate-500 mb-1">Nilai (Rp)</label>
-                            <input type="number" placeholder="Rp" class="item-nilai w-full !mb-0 !py-2 text-right">
-                        </div>
+                    <div class="grid grid-cols-4 gap-2">
+                        <div><label class="text-[10px] text-slate-500 mb-1">Qty / Vol</label><input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-2 text-center font-bold" min="1" value="1" oninput="autoHitungBerat(this)"></div>
+                        <div><label class="text-[10px] text-slate-500 mb-1">Satuan</label><input type="text" placeholder="Pcs/m3" class="item-sat w-full !mb-0 !py-2 text-center" value="Pcs"></div>
+                        <div><label class="text-[10px] text-slate-500 mb-1 text-red-700">Total Berat (Kg)</label><input type="number" placeholder="Kg" class="item-berat w-full !mb-0 !py-2 text-center border-red-300 bg-red-50 font-bold" oninput="hitungKapasitas()"></div>
+                        <div><label class="text-[10px] text-slate-500 mb-1">Nilai (Rp)</label><input type="number" placeholder="Rp" class="item-nilai w-full !mb-0 !py-2 text-right"></div>
                     </div>
                 </div>
             `;
-            
+            hitungKapasitas();
             renderDash();
             lihatPrint(id);
         }
@@ -390,17 +470,32 @@
             
             let p = d.tgl.split('-');
             document.getElementById('pr-tgl').innerText = `${p[2]}/${p[1]}/${p[0]}`;
+            document.getElementById('pr-armada').innerText = d.armada || 'Mobil';
             document.getElementById('pr-driver').innerText = d.driver;
             document.getElementById('pr-nopol').innerText = d.nopol;
             document.getElementById('pr-admin').innerText = admin;
             document.getElementById('pr-driver-ttd').innerText = d.driver;
             document.getElementById('pr-tujuan-ttd').innerText = d.tujuan;
 
-            let htmlItems = "";
+            let htmlItems = ""; let grandTotalKg = 0;
             d.items.forEach((it, i) => {
-                htmlItems += `<tr><td class="text-center font-bold">${i+1}</td><td class="font-bold">${it.nama}</td><td class="text-center font-bold text-lg">${it.qty}</td><td class="text-center">${it.sat}</td></tr>`;
+                let subKg = (it.berat || 0); // Di versi ini berat sudah total per baris
+                grandTotalKg += subKg;
+                let textKg = subKg > 0 ? `${subKg.toLocaleString('id-ID')} Kg` : '-';
+                htmlItems += `<tr><td class="text-center font-bold">${i+1}</td><td class="font-bold">${it.nama}</td><td class="text-center font-bold text-lg">${it.qty}</td><td class="text-center">${it.sat}</td><td class="text-center text-[10px] font-bold text-slate-600">${textKg}</td></tr>`;
             });
             document.getElementById('pr-items').innerHTML = htmlItems;
+            document.getElementById('pr-totalkg').innerText = grandTotalKg > 0 ? grandTotalKg.toLocaleString('id-ID') + ' Kg' : '-';
+
+            // ODOL COMPLIANCE BADGE
+            let divOdol = document.getElementById('pr-odol');
+            if(d.is_odol) {
+                divOdol.innerHTML = `⚠️ DOKUMEN PERINGATAN: MUATAN ${grandTotalKg.toLocaleString('id-ID')} KG MELEBIHI BATAS LEGAL JBI ${(d.max_legal||0).toLocaleString('id-ID')} KG (OVERLOAD)`;
+                divOdol.className = "mb-6 p-2 border-2 rounded text-center font-black text-[11px] uppercase tracking-widest border-red-500 text-red-600 bg-red-50";
+            } else {
+                divOdol.innerHTML = `✅ DOKUMEN TERVALIDASI: MUATAN AMAN SESUAI REGULASI JBI KEMENHUB (BEBAS ODOL)`;
+                divOdol.className = "mb-6 p-2 border-2 rounded text-center font-black text-[11px] uppercase tracking-widest border-emerald-500 text-emerald-600 bg-emerald-50";
+            }
 
             let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=VERIFY:${d.no}_${d.tujuan.replace(/\s+/g, '')}`;
             document.getElementById('pr-qr').src = qrUrl;
@@ -417,7 +512,6 @@
             bukaTab('print');
         }
 
-        // TANDAI MANUAL SELESAI
         function tandaiSelesai(id) {
             if(confirm("Tandai Surat Jalan ini sudah selesai/diterima tujuan?")) {
                 let idx = db_do.findIndex(x => x.id === id);
@@ -425,8 +519,7 @@
                     db_do[idx].status = 'SELESAI';
                     localStorage.setItem('sj_db', JSON.stringify(db_do));
                     alert("Status diubah menjadi Selesai!");
-                    lihatPrint(id);
-                    renderDash();
+                    lihatPrint(id); renderDash();
                 }
             }
         }
@@ -441,25 +534,24 @@
             document.getElementById('v-tot').innerText = countAll;
             document.getElementById('v-done').innerText = countDone;
 
-            // ERP IN-TRANSIT VALUATION
-            let valJalan = 0;
-            let valDone = 0;
+            let valJalan = 0; let valDone = 0; let totalTonase = 0;
             db_do.forEach(d => {
-                let totalDO = d.items.reduce((sum, it) => sum + ((it.qty || 0) * (it.nilai || 0)), 0);
+                let totalDO = d.items.reduce((sum, it) => sum + ((it.nilai || 0)), 0); // Di versi material nilai bisa diisi manual per baris tanpa kali Qty
                 if(d.status === 'SELESAI') valDone += totalDO; else valJalan += totalDO;
+                totalTonase += (d.total_berat || 0);
             });
             document.getElementById('v-val-jalan').innerText = formatRp(valJalan);
             document.getElementById('v-val-done').innerText = formatRp(valDone);
+            
+            // Konversi ke TON jika lebih dari 1000 Kg
+            let textTonase = totalTonase >= 1000 ? (totalTonase / 1000).toFixed(1) + " Ton" : totalTonase + " Kg";
+            document.getElementById('v-tonase').innerText = textTonase;
 
-            // RENDER CHART
             let ctx = document.getElementById('doChart').getContext('2d');
             if(chartInst) chartInst.destroy();
             chartInst = new Chart(ctx, {
                 type: 'doughnut',
-                data: {
-                    labels: ['Dikirim', 'Selesai'],
-                    datasets: [{ data: [countAll - countDone, countDone], backgroundColor: ['#1e3a8a', '#059669'], borderWidth: 0 }]
-                },
+                data: { labels: ['Dikirim', 'Selesai'], datasets: [{ data: [countAll - countDone, countDone], backgroundColor: ['#1e3a8a', '#059669'], borderWidth: 0 }] },
                 options: { plugins: { legend: { display: false } }, cutout: '75%' }
             });
 
@@ -469,9 +561,11 @@
             db_do.slice().sort((a,b)=>b.id-a.id).forEach(d => {
                 let badge = d.status === 'SELESAI' ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-[9px] font-black">SELESAI</span>' : '<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-[9px] font-black">DIKIRIM</span>';
                 let p = d.tgl.split('-');
+                let beratStr = d.total_berat ? `<br><span class="text-[9px] font-black ${d.is_odol ? 'text-red-500' : 'text-slate-400'}">⚖️ ${d.total_berat.toLocaleString('id-ID')} Kg ${d.is_odol ? '(ODOL)' : ''}</span>` : '';
+                
                 html += `<tr class="hover:bg-slate-50 transition-colors">
                     <td class="p-3"><div class="font-black text-blue-900">${d.no}</div><div class="text-[9px] text-slate-500">${p[2]}/${p[1]}/${p[0]}</div></td>
-                    <td class="p-3 font-bold">${d.tujuan}</td>
+                    <td class="p-3 font-bold">${d.tujuan}${beratStr}</td>
                     <td class="p-3 text-center">${badge}</td>
                     <td class="p-3 text-center"><button class="bg-blue-100 text-blue-700 px-3 py-1 rounded font-bold text-[10px] hover:bg-blue-600 hover:text-white transition-colors" onclick="lihatPrint(${d.id})">Buka</button></td>
                 </tr>`;
@@ -488,6 +582,7 @@
         }
 
         renderDash();
+        hitungKapasitas();
     </script>
 </body>
 </html>
