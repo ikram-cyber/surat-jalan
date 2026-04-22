@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Surat Jalan Pro | E-Delivery Order</title>
+    <title>Surat Jalan Pro | E-Delivery Order & GPS Tracking</title>
     <meta name="theme-color" content="#1e3a8a">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #1e293b; -webkit-tap-highlight-color: transparent; }
@@ -33,7 +34,7 @@
             
             .print-header { border-bottom: 4px solid #1e3a8a; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
             .print-title { font-size: 28px; font-weight: 900; color: #1e3a8a !important; margin: 0; text-transform: uppercase; letter-spacing: 2px; -webkit-print-color-adjust: exact; }
-            .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 30px; }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 10px; }
             .print-table th, .print-table td { border: 1px solid #cbd5e1; padding: 10px 12px; text-align: left; }
             .print-table th { background-color: #f1f5f9 !important; font-weight: 800; -webkit-print-color-adjust: exact; }
             .ttd-box { text-align: center; width: 30%; }
@@ -43,20 +44,45 @@
 <body class="pb-24">
 
     <div class="bg-blue-900 text-white p-5 rounded-b-3xl shadow-lg relative overflow-hidden no-print">
-        <div class="absolute -right-4 -top-4 text-8xl opacity-10"><i class="fas fa-truck-fast"></i></div>
+        <div class="absolute -right-4 -top-4 text-8xl opacity-10"><i class="fas fa-satellite-dish"></i></div>
         <h1 class="text-2xl font-black tracking-wide" id="h-pt">E-DELIVERY PRO</h1>
-        <p class="text-xs font-semibold opacity-80 mt-1 tracking-wider uppercase">Sistem Manajemen Surat Jalan</p>
+        <p class="text-[10px] font-bold opacity-80 mt-1 tracking-widest uppercase">GPS Tracked Logistics System</p>
     </div>
 
     <div id="p-home" class="page active px-4 mt-5">
-        <div class="grid grid-cols-2 gap-3 mb-5">
+        <h3 class="font-black text-blue-900 text-xs uppercase tracking-wider mb-3"><i class="fas fa-chart-pie mr-1"></i> Executive Analytics</h3>
+        
+        <div class="grid grid-cols-2 gap-3 mb-3">
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
-                <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Total Kiriman</div>
-                <div class="text-2xl font-black text-blue-900 mt-1" id="v-tot">0</div>
+                <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Aset Dalam Perjalanan</div>
+                <div class="text-lg font-black text-amber-600 mt-1" id="v-val-jalan">Rp 0</div>
             </div>
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
-                <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Selesai (Terkirim)</div>
-                <div class="text-2xl font-black text-emerald-600 mt-1" id="v-done">0</div>
+                <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Aset Terkirim (Selesai)</div>
+                <div class="text-lg font-black text-emerald-600 mt-1" id="v-val-done">Rp 0</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 mb-5">
+            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Dikirim</div>
+                    <div class="text-xl font-black text-blue-900 mt-1" id="v-tot">0</div>
+                </div>
+                <div class="text-2xl text-blue-100"><i class="fas fa-truck"></i></div>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Selesai</div>
+                    <div class="text-xl font-black text-emerald-600 mt-1" id="v-done">0</div>
+                </div>
+                <div class="text-2xl text-emerald-100"><i class="fas fa-check-circle"></i></div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 mb-5 flex justify-center">
+            <div class="w-2/3 max-w-[200px]">
+                <canvas id="doChart"></canvas>
             </div>
         </div>
 
@@ -98,20 +124,24 @@
 
             <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-4">
                 <div class="flex justify-between items-center mb-2">
-                    <label class="mb-0 text-blue-900">Daftar Barang Bawaan</label>
+                    <div>
+                        <label class="mb-0 text-blue-900">Daftar Barang Bawaan</label>
+                        <p class="text-[9px] text-slate-500">Nilai (Rp) disembunyikan saat dicetak.</p>
+                    </div>
                     <button class="bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-bold" onclick="addItemRow()"><i class="fas fa-plus"></i> Tambah</button>
                 </div>
                 <div id="item-container" class="space-y-2">
                     <div class="flex gap-2 items-center item-row">
-                        <input type="text" placeholder="Nama Barang" class="item-nama flex-1 !mb-0 !py-2">
-                        <input type="number" placeholder="Qty" class="item-qty w-16 !mb-0 !py-2 text-center" min="1" value="1">
-                        <input type="text" placeholder="Satuan" class="item-sat w-16 !mb-0 !py-2" value="Pcs">
+                        <input type="text" placeholder="Nama Barang" class="item-nama flex-[2] !mb-0 !py-2">
+                        <input type="number" placeholder="Qty" class="item-qty w-14 !mb-0 !py-2 text-center" min="1" value="1">
+                        <input type="text" placeholder="Satuan" class="item-sat w-14 !mb-0 !py-2" value="Pcs">
+                        <input type="number" placeholder="Nilai/Harga" class="item-nilai flex-1 !mb-0 !py-2 text-right">
                         <button class="text-red-500 p-2" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
             </div>
 
-            <button class="w-full bg-blue-600 hover:bg-blue-800 text-white font-black py-3 rounded-lg uppercase tracking-widest shadow-md transition-all" onclick="simpanDO()">💾 Simpan & Cetak</button>
+            <button class="w-full bg-blue-600 hover:bg-blue-800 text-white font-black py-3 rounded-lg uppercase tracking-widest shadow-md transition-all" onclick="simpanDO()">💾 Simpan & Terbitkan DO</button>
         </div>
     </div>
 
@@ -153,13 +183,22 @@
                         <th>NAMA / DESKRIPSI BARANG</th>
                         <th class="w-24 text-center">QTY</th>
                         <th class="w-24 text-center">SATUAN</th>
-                    </tr>
+                        </tr>
                 </thead>
                 <tbody id="pr-items">
                     </tbody>
             </table>
 
-            <div class="flex justify-between items-end mt-10">
+            <div id="pr-geotag" class="mb-8 p-3 bg-slate-50 border border-slate-200 rounded text-[10px] font-mono hidden">
+                <div class="font-bold text-slate-700 mb-1 border-b border-slate-200 pb-1">🔒 SECURE DELIVERY VERIFICATION</div>
+                <div class="flex justify-between">
+                    <div><span class="font-bold">Status:</span> DELIVERED</div>
+                    <div><span class="font-bold">Timestamp:</span> <span id="geo-time"></span></div>
+                </div>
+                <div><span class="font-bold">Coordinates:</span> <span id="geo-loc"></span></div>
+            </div>
+
+            <div class="flex justify-between items-end mt-4">
                 <div class="w-1/4 text-center">
                     <img id="pr-qr" class="w-24 h-24 border-2 border-slate-800 p-1 mx-auto object-cover" src="" alt="QR Code Verifikasi">
                     <div class="text-[8px] font-black mt-1 tracking-widest uppercase">Scan Verifikasi</div>
@@ -168,15 +207,18 @@
                 <div class="flex w-3/4 justify-around">
                     <div class="ttd-box">
                         <p class="font-bold text-xs mb-8">Pengirim (Gudang)</p>
-                        <div style="height:60px;"></div> <p class="font-black text-sm border-t border-slate-400 pt-1" id="pr-admin">Admin</p>
+                        <div style="height:60px;"></div>
+                        <p class="font-black text-sm border-t border-slate-400 pt-1" id="pr-admin">Admin</p>
                     </div>
                     <div class="ttd-box">
                         <p class="font-bold text-xs mb-8">Driver / Kurir</p>
-                        <div style="height:60px;"></div> <p class="font-black text-sm border-t border-slate-400 pt-1" id="pr-driver-ttd">Driver</p>
+                        <div style="height:60px;"></div>
+                        <p class="font-black text-sm border-t border-slate-400 pt-1" id="pr-driver-ttd">Driver</p>
                     </div>
                     <div class="ttd-box">
                         <p class="font-bold text-xs mb-8">Penerima</p>
-                        <div style="height:60px;"></div> <p class="font-black text-sm border-t border-slate-400 pt-1" id="pr-tujuan-ttd">Tujuan</p>
+                        <div style="height:60px;"></div>
+                        <p class="font-black text-sm border-t border-slate-400 pt-1" id="pr-tujuan-ttd">Tujuan</p>
                     </div>
                 </div>
             </div>
@@ -206,44 +248,43 @@
     </nav>
 
     <script>
-        // DATABASE
+        // DATABASE SCHEMA: { id, no, tgl, tujuan, alamat, driver, nopol, status, geotag: {lat, lon, time}, items: [{nama, qty, sat, nilai}] }
         let db_do = JSON.parse(localStorage.getItem('sj_db')) || [];
         let curViewId = null;
+        let chartInst = null;
 
-        // TIME INIT
         let now = new Date(); let offset = now.getTimezoneOffset() * 60000;
         let localIso = new Date(now.getTime() - offset).toISOString().slice(0, 10);
         document.getElementById('f-tgl').value = localIso;
 
-        // SETTINGS
+        const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+
         function simpanSet() {
             localStorage.setItem('sj_pt', document.getElementById('set-pt').value);
             localStorage.setItem('sj_admin', document.getElementById('set-admin').value);
             renderDash(); alert("Pengaturan tersimpan!");
         }
 
-        // GENERATE DO NUMBER
         function generateDO() {
             let count = db_do.length + 1;
             let dateStr = localIso.replace(/-/g, "");
             document.getElementById('f-no').value = `DO-${dateStr}-${count.toString().padStart(3,'0')}`;
         }
 
-        // DYNAMIC ITEMS
         function addItemRow() {
             const container = document.getElementById('item-container');
             const row = document.createElement('div');
             row.className = "flex gap-2 items-center item-row";
             row.innerHTML = `
-                <input type="text" placeholder="Nama Barang" class="item-nama flex-1 !mb-0 !py-2">
-                <input type="number" placeholder="Qty" class="item-qty w-16 !mb-0 !py-2 text-center" min="1" value="1">
-                <input type="text" placeholder="Satuan" class="item-sat w-16 !mb-0 !py-2" value="Pcs">
+                <input type="text" placeholder="Nama Barang" class="item-nama flex-[2] !mb-0 !py-2">
+                <input type="number" placeholder="Qty" class="item-qty w-14 !mb-0 !py-2 text-center" min="1" value="1">
+                <input type="text" placeholder="Satuan" class="item-sat w-14 !mb-0 !py-2" value="Pcs">
+                <input type="number" placeholder="Nilai/Harga" class="item-nilai flex-1 !mb-0 !py-2 text-right">
                 <button class="text-red-500 p-2" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
             `;
             container.appendChild(row);
         }
 
-        // SIMPAN SURAT JALAN
         function simpanDO() {
             let no = document.getElementById('f-no').value.trim();
             let tgl = document.getElementById('f-tgl').value;
@@ -254,19 +295,19 @@
 
             if(!no || !tujuan || !driver) return alert("Nomor DO, Tujuan, dan Driver wajib diisi!");
 
-            // Collect items
             let items = [];
             document.querySelectorAll('.item-row').forEach(row => {
                 let nm = row.querySelector('.item-nama').value.trim();
                 let q = parseInt(row.querySelector('.item-qty').value) || 0;
                 let s = row.querySelector('.item-sat').value.trim();
-                if(nm && q > 0) items.push({ nama: nm, qty: q, sat: s });
+                let v = parseInt(row.querySelector('.item-nilai').value) || 0;
+                if(nm && q > 0) items.push({ nama: nm, qty: q, sat: s, nilai: v });
             });
 
             if(items.length === 0) return alert("Minimal isi 1 barang!");
 
             let id = Date.now();
-            let data = { id, no, tgl, tujuan, alamat, driver, nopol, items, status: 'DIKIRIM' };
+            let data = { id, no, tgl, tujuan, alamat, driver, nopol, items, status: 'DIKIRIM', geotag: null };
             
             db_do.push(data);
             localStorage.setItem('sj_db', JSON.stringify(db_do));
@@ -275,9 +316,10 @@
             document.getElementById('f-no').value = ""; document.getElementById('f-tujuan').value = ""; document.getElementById('f-alamat').value = ""; document.getElementById('f-driver').value = ""; document.getElementById('f-nopol').value = "";
             document.getElementById('item-container').innerHTML = `
                 <div class="flex gap-2 items-center item-row">
-                    <input type="text" placeholder="Nama Barang" class="item-nama flex-1 !mb-0 !py-2">
-                    <input type="number" placeholder="Qty" class="item-qty w-16 !mb-0 !py-2 text-center" min="1" value="1">
-                    <input type="text" placeholder="Satuan" class="item-sat w-16 !mb-0 !py-2" value="Pcs">
+                    <input type="text" placeholder="Nama Barang" class="item-nama flex-[2] !mb-0 !py-2">
+                    <input type="number" placeholder="Qty" class="item-qty w-14 !mb-0 !py-2 text-center" min="1" value="1">
+                    <input type="text" placeholder="Satuan" class="item-sat w-14 !mb-0 !py-2" value="Pcs">
+                    <input type="number" placeholder="Nilai/Harga" class="item-nilai flex-1 !mb-0 !py-2 text-right">
                     <button class="text-red-500 p-2" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
                 </div>
             `;
@@ -286,7 +328,6 @@
             lihatPrint(id);
         }
 
-        // VIEW & PRINT
         function lihatPrint(id) {
             let d = db_do.find(x => x.id === id); if(!d) return;
             curViewId = id;
@@ -307,23 +348,30 @@
             document.getElementById('pr-driver-ttd').innerText = d.driver;
             document.getElementById('pr-tujuan-ttd').innerText = d.tujuan;
 
-            // Render Items
             let htmlItems = "";
             d.items.forEach((it, i) => {
                 htmlItems += `<tr><td class="text-center font-bold">${i+1}</td><td class="font-bold">${it.nama}</td><td class="text-center font-bold text-lg">${it.qty}</td><td class="text-center">${it.sat}</td></tr>`;
             });
             document.getElementById('pr-items').innerHTML = htmlItems;
 
-            // QR Code Generator (FIXED to use img tag instead of background-image for print support)
             let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=VERIFY:${d.no}_${d.tujuan.replace(/\s+/g, '')}`;
             document.getElementById('pr-qr').src = qrUrl;
 
-            // Setup Buttons
+            // Geotag UI
+            let geoDiv = document.getElementById('pr-geotag');
+            if(d.status === 'SELESAI' && d.geotag) {
+                document.getElementById('geo-time').innerText = d.geotag.time;
+                document.getElementById('geo-loc').innerText = `${d.geotag.lat}, ${d.geotag.lon}`;
+                geoDiv.style.display = 'block';
+            } else {
+                geoDiv.style.display = 'none';
+            }
+
             let actionDiv = document.getElementById('action-buttons');
-            let btnSelesai = d.status === 'DIKIRIM' ? `<button class="flex-1 bg-emerald-600 text-white py-2 rounded font-bold shadow-md" onclick="tandaiSelesai(${d.id})"><i class="fas fa-check"></i> Selesai</button>` : '';
+            let btnSelesai = d.status === 'DIKIRIM' ? `<button class="flex-[1.5] bg-emerald-600 text-white py-2 rounded font-bold shadow-md" onclick="tandaiSelesai(${d.id})"><i class="fas fa-location-dot"></i> Selesai & GPS Tag</button>` : '';
             
             actionDiv.innerHTML = `
-                <button class="flex-[0.5] bg-slate-500 text-white py-2 rounded font-bold shadow-md" onclick="bukaTab('home')"><i class="fas fa-arrow-left"></i> Kembali</button>
+                <button class="flex-1 bg-slate-500 text-white py-2 rounded font-bold shadow-md" onclick="bukaTab('home')"><i class="fas fa-arrow-left"></i> Kembali</button>
                 <button class="flex-1 bg-blue-600 text-white py-2 rounded font-bold shadow-md" onclick="window.print()"><i class="fas fa-print"></i> Cetak A4</button>
                 ${btnSelesai}
             `;
@@ -331,17 +379,37 @@
             bukaTab('print');
         }
 
-        // TANDAI MANUAL SELESAI
         function tandaiSelesai(id) {
-            if(confirm("Tandai Surat Jalan ini sudah selesai/diterima tujuan?")) {
+            if(confirm("Pastikan Anda berada di lokasi tujuan. Sistem akan merekam koordinat GPS Anda. Lanjutkan?")) {
                 let idx = db_do.findIndex(x => x.id === id);
                 if(idx > -1) {
-                    db_do[idx].status = 'SELESAI';
-                    localStorage.setItem('sj_db', JSON.stringify(db_do));
-                    lihatPrint(id); // Reload view
-                    renderDash();
+                    // Try to get GPS Location
+                    if ("geolocation" in navigator) {
+                        navigator.geolocation.getCurrentPosition(
+                            function(position) {
+                                saveDeliveryStatus(idx, position.coords.latitude, position.coords.longitude);
+                            },
+                            function(error) {
+                                alert("Gagal mendapatkan lokasi. Pastikan GPS nyala. Menyimpan tanpa geotag.");
+                                saveDeliveryStatus(idx, "Location Denied", "Location Denied");
+                            },
+                            { enableHighAccuracy: true, timeout: 5000 }
+                        );
+                    } else {
+                        saveDeliveryStatus(idx, "Not Supported", "Not Supported");
+                    }
                 }
             }
+        }
+
+        function saveDeliveryStatus(idx, lat, lon) {
+            let timestamp = new Date().toLocaleString('id-ID');
+            db_do[idx].status = 'SELESAI';
+            db_do[idx].geotag = { lat: lat, lon: lon, time: timestamp };
+            localStorage.setItem('sj_db', JSON.stringify(db_do));
+            alert("Delivery sukses divalidasi dengan Geotag!");
+            lihatPrint(db_do[idx].id);
+            renderDash();
         }
 
         function renderDash() {
@@ -349,8 +417,32 @@
             document.getElementById('set-pt').value = localStorage.getItem('sj_pt') || "";
             document.getElementById('set-admin').value = localStorage.getItem('sj_admin') || "";
 
-            document.getElementById('v-tot').innerText = db_do.length;
-            document.getElementById('v-done').innerText = db_do.filter(x => x.status === 'SELESAI').length;
+            let countAll = db_do.length;
+            let countDone = db_do.filter(x => x.status === 'SELESAI').length;
+            document.getElementById('v-tot').innerText = countAll;
+            document.getElementById('v-done').innerText = countDone;
+
+            // ERP IN-TRANSIT VALUATION
+            let valJalan = 0;
+            let valDone = 0;
+            db_do.forEach(d => {
+                let totalDO = d.items.reduce((sum, it) => sum + (it.qty * it.nilai), 0);
+                if(d.status === 'SELESAI') valDone += totalDO; else valJalan += totalDO;
+            });
+            document.getElementById('v-val-jalan').innerText = formatRp(valJalan);
+            document.getElementById('v-val-done').innerText = formatRp(valDone);
+
+            // RENDER CHART
+            let ctx = document.getElementById('doChart').getContext('2d');
+            if(chartInst) chartInst.destroy();
+            chartInst = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Dikirim', 'Selesai'],
+                    datasets: [{ data: [countAll - countDone, countDone], backgroundColor: ['#1e3a8a', '#059669'], borderWidth: 0 }]
+                },
+                options: { plugins: { legend: { display: false } }, cutout: '75%' }
+            });
 
             let html = "";
             if(db_do.length === 0) html = "<tr><td colspan='4' class='text-center p-5 text-slate-400 font-bold'>Belum ada pengiriman.</td></tr>";
