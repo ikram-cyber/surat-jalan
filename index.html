@@ -161,7 +161,7 @@
 
             <div class="flex justify-between items-end mt-10">
                 <div class="w-1/4 text-center">
-                    <div id="pr-qr" class="w-24 h-24 border-2 border-slate-800 p-1 mx-auto bg-cover bg-center"></div>
+                    <img id="pr-qr" class="w-24 h-24 border-2 border-slate-800 p-1 mx-auto object-cover" src="" alt="QR Code Verifikasi">
                     <div class="text-[8px] font-black mt-1 tracking-widest uppercase">Scan Verifikasi</div>
                 </div>
 
@@ -314,9 +314,9 @@
             });
             document.getElementById('pr-items').innerHTML = htmlItems;
 
-            // QR Code Generator
+            // QR Code Generator (FIXED to use img tag instead of background-image for print support)
             let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=VERIFY:${d.no}_${d.tujuan.replace(/\s+/g, '')}`;
-            document.getElementById('pr-qr').style.backgroundImage = `url('${qrUrl}')`;
+            document.getElementById('pr-qr').src = qrUrl;
 
             // Setup Buttons
             let actionDiv = document.getElementById('action-buttons');
