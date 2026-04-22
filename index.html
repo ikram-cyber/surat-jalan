@@ -152,38 +152,51 @@
                     <button class="bg-blue-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm" onclick="addItemRow()"><i class="fas fa-plus"></i> Tambah</button>
                 </div>
                 
-                <div id="item-container" class="space-y-3">
-                    <div class="item-row bg-white p-3 rounded-lg border border-slate-200 shadow-sm relative">
+                <div id="item-container" class="space-y-4">
+                    <div class="item-row bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative">
                         <button class="absolute top-2 right-2 text-red-500 p-2 hover:bg-red-50 rounded" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>
                         
-                        <div class="grid grid-cols-2 gap-2 mb-2 pr-8">
+                        <div class="mb-3 pr-6">
+                            <label class="text-[10px] text-slate-500 mb-1">Nama Barang / Deskripsi Material</label>
+                            <input type="text" placeholder="Contoh: Pasir Cor / Besi Beton" class="item-nama w-full !mb-0 !py-3">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="text-[10px] text-slate-500 mb-1">Jenis Material (Otomatisasi Densitas)</label>
+                            <select class="item-mat w-full !mb-0 !py-3 text-[11px] font-bold bg-slate-50" onchange="autoHitungBerat(this)">
+                                <option value="1">Barang Umum (Manual Kg)</option>
+                                <option value="1500">Pasir Basah (± 1.500 Kg/m³)</option>
+                                <option value="1200">Tanah Urug (± 1.200 Kg/m³)</option>
+                                <option value="1400">Batu Split (± 1.400 Kg/m³)</option>
+                                <option value="2400">Beton Cor / Aspal (± 2.400 Kg/m³)</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 mb-3">
                             <div>
-                                <label class="text-[10px] text-slate-500 mb-1">Nama Barang</label>
-                                <input type="text" placeholder="Contoh: Pasir Cor" class="item-nama w-full !mb-0 !py-2">
+                                <label class="text-[10px] text-slate-500 mb-1">Qty / Volume</label>
+                                <input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-3 text-center font-bold text-lg" min="1" value="1" oninput="autoHitungBerat(this)">
                             </div>
                             <div>
-                                <label class="text-[10px] text-slate-500 mb-1">Jenis Material (Densitas)</label>
-                                <select class="item-mat w-full !mb-0 !py-2 text-[10px] font-bold" onchange="autoHitungBerat(this)">
-                                    <option value="1">Barang Umum (Manual Kg)</option>
-                                    <option value="1500">Pasir Basah (± 1.500 Kg/m³)</option>
-                                    <option value="1200">Tanah Urug (± 1.200 Kg/m³)</option>
-                                    <option value="1400">Batu Split (± 1.400 Kg/m³)</option>
-                                    <option value="2400">Beton Cor / Aspal (± 2.400 Kg/m³)</option>
-                                </select>
+                                <label class="text-[10px] text-slate-500 mb-1">Satuan</label>
+                                <input type="text" placeholder="Pcs/m3" class="item-sat w-full !mb-0 !py-3 text-center" value="Pcs">
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-4 gap-2">
-                            <div><label class="text-[10px] text-slate-500 mb-1">Qty / Vol</label><input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-2 text-center font-bold" min="1" value="1" oninput="autoHitungBerat(this)"></div>
-                            <div><label class="text-[10px] text-slate-500 mb-1">Satuan</label><input type="text" placeholder="Pcs/m3" class="item-sat w-full !mb-0 !py-2 text-center" value="Pcs"></div>
-                            <div><label class="text-[10px] text-slate-500 mb-1 text-red-700">Total Berat (Kg)</label><input type="number" placeholder="Kg" class="item-berat w-full !mb-0 !py-2 text-center border-red-300 bg-red-50 font-bold" oninput="hitungKapasitas()"></div>
-                            <div><label class="text-[10px] text-slate-500 mb-1">Nilai (Rp)</label><input type="number" placeholder="Rp" class="item-nilai w-full !mb-0 !py-2 text-right"></div>
+                        <div class="mb-3">
+                            <label class="text-[10px] text-slate-500 mb-1 text-red-700 font-black">Total Berat (Kg)</label>
+                            <input type="number" placeholder="Beban dalam Kg" class="item-berat w-full !mb-0 !py-3 border-red-300 bg-red-50 font-black tracking-wide" oninput="hitungKapasitas()">
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] text-slate-500 mb-1 text-emerald-700 font-black">Total Nilai / Harga (Rp)</label>
+                            <input type="number" placeholder="Contoh: 1000000000" class="item-nilai w-full !mb-0 !py-3 font-black text-emerald-900 border-emerald-300 bg-emerald-50 tracking-widest text-lg">
                         </div>
                     </div>
                 </div>
             </div>
 
-            <button class="w-full bg-blue-600 hover:bg-blue-800 text-white font-black py-3 rounded-lg uppercase tracking-widest shadow-md transition-all" onclick="simpanDO()">💾 Simpan & Terbitkan DO</button>
+            <button class="w-full bg-blue-600 hover:bg-blue-800 text-white font-black py-4 rounded-lg uppercase tracking-widest shadow-md transition-all text-sm" onclick="simpanDO()">💾 Simpan & Terbitkan DO</button>
         </div>
     </div>
 
@@ -298,9 +311,7 @@
             document.getElementById('f-no').value = `DO-${dateStr}-${count.toString().padStart(3,'0')}`;
         }
 
-        // NEW: MATERIAL DENSITY CALCULATOR
         function autoHitungBerat(el) {
-            // Find the parent row
             let row = el.closest('.item-row');
             let typeMat = parseFloat(row.querySelector('.item-mat').value);
             let inputQty = row.querySelector('.item-qty');
@@ -308,13 +319,11 @@
             let inputBerat = row.querySelector('.item-berat');
 
             if(typeMat === 1) {
-                // Barang Umum
                 inputBerat.readOnly = false;
                 inputBerat.classList.remove('bg-red-50');
             } else {
-                // Material Konstruksi (Kubikasi)
                 let qty = parseFloat(inputQty.value) || 0;
-                inputSat.value = "m3"; // Set satuan otomatis ke Kubik
+                inputSat.value = "m3"; 
                 let totalKg = qty * typeMat;
                 inputBerat.value = totalKg;
                 inputBerat.readOnly = true;
@@ -329,7 +338,6 @@
             
             let totalKg = 0;
             document.querySelectorAll('.item-row').forEach(row => {
-                // Untuk berat, kita langsung ambil dari input berat karena sudah dikalikan kalau material khusus
                 let b = parseFloat(row.querySelector('.item-berat').value) || 0;
                 totalKg += b; 
             });
@@ -357,26 +365,45 @@
         function addItemRow() {
             const container = document.getElementById('item-container');
             const row = document.createElement('div');
-            row.className = "item-row bg-white p-3 rounded-lg border border-slate-200 shadow-sm relative";
+            row.className = "item-row bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative";
             row.innerHTML = `
                 <button class="absolute top-2 right-2 text-red-500 p-2 hover:bg-red-50 rounded" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>
-                <div class="grid grid-cols-2 gap-2 mb-2 pr-8">
-                    <div><label class="text-[10px] text-slate-500 mb-1">Nama Barang</label><input type="text" placeholder="Contoh: Pasir Cor" class="item-nama w-full !mb-0 !py-2"></div>
-                    <div><label class="text-[10px] text-slate-500 mb-1">Jenis Material</label>
-                        <select class="item-mat w-full !mb-0 !py-2 text-[10px] font-bold" onchange="autoHitungBerat(this)">
-                            <option value="1">Barang Umum (Manual Kg)</option>
-                            <option value="1500">Pasir Basah (± 1.500 Kg/m³)</option>
-                            <option value="1200">Tanah Urug (± 1.200 Kg/m³)</option>
-                            <option value="1400">Batu Split (± 1.400 Kg/m³)</option>
-                            <option value="2400">Beton Cor / Aspal (± 2.400 Kg/m³)</option>
-                        </select>
+                
+                <div class="mb-3 pr-6">
+                    <label class="text-[10px] text-slate-500 mb-1">Nama Barang / Deskripsi Material</label>
+                    <input type="text" placeholder="Contoh: Pasir Cor / Besi Beton" class="item-nama w-full !mb-0 !py-3">
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-[10px] text-slate-500 mb-1">Jenis Material (Otomatisasi Densitas)</label>
+                    <select class="item-mat w-full !mb-0 !py-3 text-[11px] font-bold bg-slate-50" onchange="autoHitungBerat(this)">
+                        <option value="1">Barang Umum (Manual Kg)</option>
+                        <option value="1500">Pasir Basah (± 1.500 Kg/m³)</option>
+                        <option value="1200">Tanah Urug (± 1.200 Kg/m³)</option>
+                        <option value="1400">Batu Split (± 1.400 Kg/m³)</option>
+                        <option value="2400">Beton Cor / Aspal (± 2.400 Kg/m³)</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <label class="text-[10px] text-slate-500 mb-1">Qty / Volume</label>
+                        <input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-3 text-center font-bold text-lg" min="1" value="1" oninput="autoHitungBerat(this)">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-500 mb-1">Satuan</label>
+                        <input type="text" placeholder="Pcs/m3" class="item-sat w-full !mb-0 !py-3 text-center" value="Pcs">
                     </div>
                 </div>
-                <div class="grid grid-cols-4 gap-2">
-                    <div><label class="text-[10px] text-slate-500 mb-1">Qty / Vol</label><input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-2 text-center font-bold" min="1" value="1" oninput="autoHitungBerat(this)"></div>
-                    <div><label class="text-[10px] text-slate-500 mb-1">Satuan</label><input type="text" placeholder="Pcs/m3" class="item-sat w-full !mb-0 !py-2 text-center" value="Pcs"></div>
-                    <div><label class="text-[10px] text-slate-500 mb-1 text-red-700">Total Berat (Kg)</label><input type="number" placeholder="Kg" class="item-berat w-full !mb-0 !py-2 text-center border-red-300 bg-red-50 font-bold" oninput="hitungKapasitas()"></div>
-                    <div><label class="text-[10px] text-slate-500 mb-1">Nilai (Rp)</label><input type="number" placeholder="Rp" class="item-nilai w-full !mb-0 !py-2 text-right"></div>
+
+                <div class="mb-3">
+                    <label class="text-[10px] text-slate-500 mb-1 text-red-700 font-black">Total Berat (Kg)</label>
+                    <input type="number" placeholder="Beban dalam Kg" class="item-berat w-full !mb-0 !py-3 border-red-300 bg-red-50 font-black tracking-wide" oninput="hitungKapasitas()">
+                </div>
+
+                <div>
+                    <label class="text-[10px] text-slate-500 mb-1 text-emerald-700 font-black">Total Nilai / Harga (Rp)</label>
+                    <input type="number" placeholder="Contoh: 1000000000" class="item-nilai w-full !mb-0 !py-3 font-black text-emerald-900 border-emerald-300 bg-emerald-50 tracking-widest text-lg">
                 </div>
             `;
             container.appendChild(row);
@@ -409,13 +436,12 @@
                 let v = parseInt(row.querySelector('.item-nilai').value) || 0;
                 if(nm && q > 0) { 
                     items.push({ nama: nm, qty: q, sat: s, berat: b, nilai: v }); 
-                    totalKg += b; // Berat sudah total dari item
+                    totalKg += b; 
                 }
             });
 
             if(items.length === 0) return alert("Minimal isi 1 barang yang valid!");
             
-            // ODOL VALIDATION
             let isOverload = totalKg > maxKapasitasArmada;
             if(isOverload) {
                 if(!confirm(`⚠️ PELANGGARAN JBI (ODOL)!\nMuatan ${totalKg.toLocaleString('id-ID')} Kg melebihi batas armada ${armadaInfo} (${maxKapasitasArmada.toLocaleString('id-ID')} Kg).\nRisiko ditilang di Jembatan Timbang. Tetap paksakan terbitkan Surat Jalan?`)) return;
@@ -427,28 +453,25 @@
             db_do.push(data);
             localStorage.setItem('sj_db', JSON.stringify(db_do));
             
-            // Reset Form & Redirect
             document.getElementById('f-no').value = ""; document.getElementById('f-tujuan').value = ""; document.getElementById('f-alamat').value = ""; document.getElementById('f-driver').value = ""; document.getElementById('f-nopol').value = "";
             document.getElementById('item-container').innerHTML = `
-                <div class="item-row bg-white p-3 rounded-lg border border-slate-200 shadow-sm relative">
+                <div class="item-row bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative">
                     <button class="absolute top-2 right-2 text-red-500 p-2 hover:bg-red-50 rounded" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>
-                    <div class="grid grid-cols-2 gap-2 mb-2 pr-8">
-                        <div><label class="text-[10px] text-slate-500 mb-1">Nama Barang</label><input type="text" placeholder="Contoh: Pasir Cor" class="item-nama w-full !mb-0 !py-2"></div>
-                        <div><label class="text-[10px] text-slate-500 mb-1">Jenis Material</label>
-                            <select class="item-mat w-full !mb-0 !py-2 text-[10px] font-bold" onchange="autoHitungBerat(this)">
-                                <option value="1">Barang Umum (Manual Kg)</option>
-                                <option value="1500">Pasir Basah (± 1.500 Kg/m³)</option>
-                                <option value="1200">Tanah Urug (± 1.200 Kg/m³)</option>
-                                <option value="1400">Batu Split (± 1.400 Kg/m³)</option>
-                            </select>
-                        </div>
+                    <div class="mb-3 pr-6"><label class="text-[10px] text-slate-500 mb-1">Nama Barang / Deskripsi</label><input type="text" placeholder="Contoh: Pasir Cor" class="item-nama w-full !mb-0 !py-3"></div>
+                    <div class="mb-3"><label class="text-[10px] text-slate-500 mb-1">Jenis Material</label>
+                        <select class="item-mat w-full !mb-0 !py-3 text-[11px] font-bold bg-slate-50" onchange="autoHitungBerat(this)">
+                            <option value="1">Barang Umum (Manual Kg)</option>
+                            <option value="1500">Pasir Basah (± 1.500 Kg/m³)</option>
+                            <option value="1200">Tanah Urug (± 1.200 Kg/m³)</option>
+                            <option value="1400">Batu Split (± 1.400 Kg/m³)</option>
+                        </select>
                     </div>
-                    <div class="grid grid-cols-4 gap-2">
-                        <div><label class="text-[10px] text-slate-500 mb-1">Qty / Vol</label><input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-2 text-center font-bold" min="1" value="1" oninput="autoHitungBerat(this)"></div>
-                        <div><label class="text-[10px] text-slate-500 mb-1">Satuan</label><input type="text" placeholder="Pcs/m3" class="item-sat w-full !mb-0 !py-2 text-center" value="Pcs"></div>
-                        <div><label class="text-[10px] text-slate-500 mb-1 text-red-700">Total Berat (Kg)</label><input type="number" placeholder="Kg" class="item-berat w-full !mb-0 !py-2 text-center border-red-300 bg-red-50 font-bold" oninput="hitungKapasitas()"></div>
-                        <div><label class="text-[10px] text-slate-500 mb-1">Nilai (Rp)</label><input type="number" placeholder="Rp" class="item-nilai w-full !mb-0 !py-2 text-right"></div>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div><label class="text-[10px] text-slate-500 mb-1">Qty / Vol</label><input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-3 text-center font-bold text-lg" min="1" value="1" oninput="autoHitungBerat(this)"></div>
+                        <div><label class="text-[10px] text-slate-500 mb-1">Satuan</label><input type="text" placeholder="Pcs/m3" class="item-sat w-full !mb-0 !py-3 text-center" value="Pcs"></div>
                     </div>
+                    <div class="mb-3"><label class="text-[10px] text-slate-500 mb-1 text-red-700 font-black">Total Berat (Kg)</label><input type="number" placeholder="Kg" class="item-berat w-full !mb-0 !py-3 text-center border-red-300 bg-red-50 font-black tracking-wide" oninput="hitungKapasitas()"></div>
+                    <div><label class="text-[10px] text-slate-500 mb-1 text-emerald-700 font-black">Total Nilai / Harga (Rp)</label><input type="number" placeholder="Rp" class="item-nilai w-full !mb-0 !py-3 font-black text-emerald-900 border-emerald-300 bg-emerald-50 tracking-widest text-lg"></div>
                 </div>
             `;
             hitungKapasitas();
@@ -479,7 +502,7 @@
 
             let htmlItems = ""; let grandTotalKg = 0;
             d.items.forEach((it, i) => {
-                let subKg = (it.berat || 0); // Di versi ini berat sudah total per baris
+                let subKg = (it.berat || 0);
                 grandTotalKg += subKg;
                 let textKg = subKg > 0 ? `${subKg.toLocaleString('id-ID')} Kg` : '-';
                 htmlItems += `<tr><td class="text-center font-bold">${i+1}</td><td class="font-bold">${it.nama}</td><td class="text-center font-bold text-lg">${it.qty}</td><td class="text-center">${it.sat}</td><td class="text-center text-[10px] font-bold text-slate-600">${textKg}</td></tr>`;
@@ -487,7 +510,6 @@
             document.getElementById('pr-items').innerHTML = htmlItems;
             document.getElementById('pr-totalkg').innerText = grandTotalKg > 0 ? grandTotalKg.toLocaleString('id-ID') + ' Kg' : '-';
 
-            // ODOL COMPLIANCE BADGE
             let divOdol = document.getElementById('pr-odol');
             if(d.is_odol) {
                 divOdol.innerHTML = `⚠️ DOKUMEN PERINGATAN: MUATAN ${grandTotalKg.toLocaleString('id-ID')} KG MELEBIHI BATAS LEGAL JBI ${(d.max_legal||0).toLocaleString('id-ID')} KG (OVERLOAD)`;
@@ -536,14 +558,13 @@
 
             let valJalan = 0; let valDone = 0; let totalTonase = 0;
             db_do.forEach(d => {
-                let totalDO = d.items.reduce((sum, it) => sum + ((it.nilai || 0)), 0); // Di versi material nilai bisa diisi manual per baris tanpa kali Qty
+                let totalDO = d.items.reduce((sum, it) => sum + ((it.nilai || 0)), 0);
                 if(d.status === 'SELESAI') valDone += totalDO; else valJalan += totalDO;
                 totalTonase += (d.total_berat || 0);
             });
             document.getElementById('v-val-jalan').innerText = formatRp(valJalan);
             document.getElementById('v-val-done').innerText = formatRp(valDone);
             
-            // Konversi ke TON jika lebih dari 1000 Kg
             let textTonase = totalTonase >= 1000 ? (totalTonase / 1000).toFixed(1) + " Ton" : totalTonase + " Kg";
             document.getElementById('v-tonase').innerText = textTonase;
 
