@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Surat Jalan Pro | E-Delivery Order & GPS Tracking</title>
+    <title>Surat Jalan Pro | E-Delivery Order</title>
     <meta name="theme-color" content="#1e3a8a">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -44,9 +44,9 @@
 <body class="pb-24">
 
     <div class="bg-blue-900 text-white p-5 rounded-b-3xl shadow-lg relative overflow-hidden no-print">
-        <div class="absolute -right-4 -top-4 text-8xl opacity-10"><i class="fas fa-satellite-dish"></i></div>
+        <div class="absolute -right-4 -top-4 text-8xl opacity-10"><i class="fas fa-truck-fast"></i></div>
         <h1 class="text-2xl font-black tracking-wide" id="h-pt">E-DELIVERY PRO</h1>
-        <p class="text-[10px] font-bold opacity-80 mt-1 tracking-widest uppercase">GPS Tracked Logistics System</p>
+        <p class="text-[10px] font-bold opacity-80 mt-1 tracking-widest uppercase">Sistem Manajemen Surat Jalan</p>
     </div>
 
     <div id="p-home" class="page active px-4 mt-5">
@@ -183,22 +183,13 @@
                         <th>NAMA / DESKRIPSI BARANG</th>
                         <th class="w-24 text-center">QTY</th>
                         <th class="w-24 text-center">SATUAN</th>
-                        </tr>
+                    </tr>
                 </thead>
                 <tbody id="pr-items">
                     </tbody>
             </table>
 
-            <div id="pr-geotag" class="mb-8 p-3 bg-slate-50 border border-slate-200 rounded text-[10px] font-mono hidden">
-                <div class="font-bold text-slate-700 mb-1 border-b border-slate-200 pb-1">🔒 SECURE DELIVERY VERIFICATION</div>
-                <div class="flex justify-between">
-                    <div><span class="font-bold">Status:</span> DELIVERED</div>
-                    <div><span class="font-bold">Timestamp:</span> <span id="geo-time"></span></div>
-                </div>
-                <div><span class="font-bold">Coordinates:</span> <span id="geo-loc"></span></div>
-            </div>
-
-            <div class="flex justify-between items-end mt-4">
+            <div class="flex justify-between items-end mt-10">
                 <div class="w-1/4 text-center">
                     <img id="pr-qr" class="w-24 h-24 border-2 border-slate-800 p-1 mx-auto object-cover" src="" alt="QR Code Verifikasi">
                     <div class="text-[8px] font-black mt-1 tracking-widest uppercase">Scan Verifikasi</div>
@@ -248,7 +239,7 @@
     </nav>
 
     <script>
-        // DATABASE SCHEMA: { id, no, tgl, tujuan, alamat, driver, nopol, status, geotag: {lat, lon, time}, items: [{nama, qty, sat, nilai}] }
+        // DATABASE SCHEMA
         let db_do = JSON.parse(localStorage.getItem('sj_db')) || [];
         let curViewId = null;
         let chartInst = null;
@@ -307,7 +298,7 @@
             if(items.length === 0) return alert("Minimal isi 1 barang!");
 
             let id = Date.now();
-            let data = { id, no, tgl, tujuan, alamat, driver, nopol, items, status: 'DIKIRIM', geotag: null };
+            let data = { id, no, tgl, tujuan, alamat, driver, nopol, items, status: 'DIKIRIM' };
             
             db_do.push(data);
             localStorage.setItem('sj_db', JSON.stringify(db_do));
@@ -357,18 +348,8 @@
             let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=VERIFY:${d.no}_${d.tujuan.replace(/\s+/g, '')}`;
             document.getElementById('pr-qr').src = qrUrl;
 
-            // Geotag UI
-            let geoDiv = document.getElementById('pr-geotag');
-            if(d.status === 'SELESAI' && d.geotag) {
-                document.getElementById('geo-time').innerText = d.geotag.time;
-                document.getElementById('geo-loc').innerText = `${d.geotag.lat}, ${d.geotag.lon}`;
-                geoDiv.style.display = 'block';
-            } else {
-                geoDiv.style.display = 'none';
-            }
-
             let actionDiv = document.getElementById('action-buttons');
-            let btnSelesai = d.status === 'DIKIRIM' ? `<button class="flex-[1.5] bg-emerald-600 text-white py-2 rounded font-bold shadow-md" onclick="tandaiSelesai(${d.id})"><i class="fas fa-location-dot"></i> Selesai & GPS Tag</button>` : '';
+            let btnSelesai = d.status === 'DIKIRIM' ? `<button class="flex-[1.5] bg-emerald-600 text-white py-2 rounded font-bold shadow-md" onclick="tandaiSelesai(${d.id})"><i class="fas fa-check"></i> Tandai Selesai</button>` : '';
             
             actionDiv.innerHTML = `
                 <button class="flex-1 bg-slate-500 text-white py-2 rounded font-bold shadow-md" onclick="bukaTab('home')"><i class="fas fa-arrow-left"></i> Kembali</button>
@@ -379,37 +360,18 @@
             bukaTab('print');
         }
 
+        // TANDAI MANUAL SELESAI (TANPA GPS)
         function tandaiSelesai(id) {
-            if(confirm("Pastikan Anda berada di lokasi tujuan. Sistem akan merekam koordinat GPS Anda. Lanjutkan?")) {
+            if(confirm("Tandai Surat Jalan ini sudah selesai/diterima tujuan?")) {
                 let idx = db_do.findIndex(x => x.id === id);
                 if(idx > -1) {
-                    // Try to get GPS Location
-                    if ("geolocation" in navigator) {
-                        navigator.geolocation.getCurrentPosition(
-                            function(position) {
-                                saveDeliveryStatus(idx, position.coords.latitude, position.coords.longitude);
-                            },
-                            function(error) {
-                                alert("Gagal mendapatkan lokasi. Pastikan GPS nyala. Menyimpan tanpa geotag.");
-                                saveDeliveryStatus(idx, "Location Denied", "Location Denied");
-                            },
-                            { enableHighAccuracy: true, timeout: 5000 }
-                        );
-                    } else {
-                        saveDeliveryStatus(idx, "Not Supported", "Not Supported");
-                    }
+                    db_do[idx].status = 'SELESAI';
+                    localStorage.setItem('sj_db', JSON.stringify(db_do));
+                    alert("Status diubah menjadi Selesai!");
+                    lihatPrint(id);
+                    renderDash();
                 }
             }
-        }
-
-        function saveDeliveryStatus(idx, lat, lon) {
-            let timestamp = new Date().toLocaleString('id-ID');
-            db_do[idx].status = 'SELESAI';
-            db_do[idx].geotag = { lat: lat, lon: lon, time: timestamp };
-            localStorage.setItem('sj_db', JSON.stringify(db_do));
-            alert("Delivery sukses divalidasi dengan Geotag!");
-            lihatPrint(db_do[idx].id);
-            renderDash();
         }
 
         function renderDash() {
@@ -422,11 +384,12 @@
             document.getElementById('v-tot').innerText = countAll;
             document.getElementById('v-done').innerText = countDone;
 
-            // ERP IN-TRANSIT VALUATION
+            // ERP IN-TRANSIT VALUATION (BUG FIXED)
             let valJalan = 0;
             let valDone = 0;
             db_do.forEach(d => {
-                let totalDO = d.items.reduce((sum, it) => sum + (it.qty * it.nilai), 0);
+                // Gunakan || 0 untuk mengamankan data lama yang tidak punya properti .nilai
+                let totalDO = d.items.reduce((sum, it) => sum + ((it.qty || 0) * (it.nilai || 0)), 0);
                 if(d.status === 'SELESAI') valDone += totalDO; else valJalan += totalDO;
             });
             document.getElementById('v-val-jalan').innerText = formatRp(valJalan);
