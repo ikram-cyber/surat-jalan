@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Surat Jalan Pro | E-Delivery Order</title>
+    <meta name="theme-color" content="#1e3a8a">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+        
+        .page { display: none; animation: fadeIn 0.3s ease; } .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); z-index: 50; border-top: 1px solid #e2e8f0; }
+        .nav-item { color: #94a3b8; display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; width: 25%; }
+        .nav-item.active { color: #1e3a8a; transform: translateY(-2px); }
+        .nav-icon { font-size: 22px; margin-bottom: 4px; }
+
+        input, select, textarea { width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none; transition: 0.3s; background: #fff; }
+        input:focus, select:focus, textarea:focus { border-color: #1e3a8a; box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1); }
+        label { font-size: 11px; font-weight: 800; color: #475569; margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Canvas Signature */
+        #sig-canvas { border: 2px dashed #94a3b8; border-radius: 8px; background: #f8fafc; cursor: crosshair; touch-action: none; width: 100%; height: 150px; }
+
+        /* Print Layout (A4 Corporate Standard) */
+        @media print {
+            body { background: white; padding: 0; margin: 0; font-size: 12pt; color: #000; }
+            .no-print, .bottom-nav { display: none !important; }
+            .print-only { display: block !important; }
+            .page { display: block; }
+            #p-home, #p-form, #p-seting { display: none !important; }
+            #p-print { display: block !important; padding: 0; }
+            
+            .print-header { border-bottom: 4px solid #1e3a8a; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+            .print-title { font-size: 28px; font-weight: 900; color: #1e3a8a !important; margin: 0; text-transform: uppercase; letter-spacing: 2px; -webkit-print-color-adjust: exact; }
+            .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 30px; }
+            .print-table th, .print-table td { border: 1px solid #cbd5e1; padding: 10px 12px; text-align: left; }
+            .print-table th { background-color: #f1f5f9 !important; font-weight: 800; -webkit-print-color-adjust: exact; }
+            .ttd-box { text-align: center; width: 30%; }
+            .ttd-img { max-height: 80px; margin: 10px auto; display: block; }
+        }
+        .print-only { display: none; }
+    </style>
+</head>
+<body class="pb-24">
+
+    <div class="bg-blue-900 text-white p-5 rounded-b-3xl shadow-lg relative overflow-hidden no-print">
+        <div class="absolute -right-4 -top-4 text-8xl opacity-10"><i class="fas fa-truck-fast"></i></div>
+        <h1 class="text-2xl font-black tracking-wide" id="h-pt">E-DELIVERY PRO</h1>
+        <p class="text-xs font-semibold opacity-80 mt-1 tracking-wider uppercase">Sistem Manajemen Surat Jalan</p>
+    </div>
+
+    <div id="p-home" class="page active px-4 mt-5">
+        <div class="grid grid-cols-2 gap-3 mb-5">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+                <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Total Kiriman</div>
+                <div class="text-2xl font-black text-blue-900 mt-1" id="v-tot">0</div>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+                <div class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Selesai (Terkirim)</div>
+                <div class="text-2xl font-black text-emerald-600 mt-1" id="v-done">0</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-slate-50 p-3 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="font-black text-slate-700 text-xs uppercase tracking-wider"><i class="fas fa-list-ul mr-1"></i> Log Surat Jalan Terbaru</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left">
+                    <thead class="bg-slate-100 text-slate-500 uppercase font-black text-[9px]">
+                        <tr><th class="p-3">No. DO / Tgl</th><th class="p-3">Tujuan</th><th class="p-3 text-center">Status</th><th class="p-3 text-center">Aksi</th></tr>
+                    </thead>
+                    <tbody id="table-dash" class="divide-y divide-slate-100">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="p-form" class="page px-4 mt-5">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 mb-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+                <h3 class="font-black text-blue-900 text-sm uppercase tracking-wide"><i class="fas fa-file-signature mr-1"></i> Buat Surat Jalan</h3>
+                <button class="bg-amber-500 text-white px-3 py-1 rounded text-xs font-bold shadow-sm" onclick="generateDO()"><i class="fas fa-bolt"></i> Auto No</button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div><label>Nomor DO</label><input type="text" id="f-no" placeholder="DO-2026-001" class="font-bold text-blue-900"></div>
+                <div><label>Tanggal</label><input type="date" id="f-tgl"></div>
+            </div>
+            
+            <div class="mb-3"><label>Tujuan / Perusahaan Penerima</label><input type="text" id="f-tujuan" placeholder="PT. Penerima / Nama Toko"></div>
+            <div class="mb-4"><label>Alamat Pengiriman</label><textarea id="f-alamat" rows="2" placeholder="Alamat lengkap tujuan..."></textarea></div>
+            
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div><label>Nama Driver</label><input type="text" id="f-driver" placeholder="Nama Supir"></div>
+                <div><label>No. Polisi Kendaraan</label><input type="text" id="f-nopol" placeholder="B 1234 CD"></div>
+            </div>
+
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="mb-0 text-blue-900">Daftar Barang Bawaan</label>
+                    <button class="bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-bold" onclick="addItemRow()"><i class="fas fa-plus"></i> Tambah</button>
+                </div>
+                <div id="item-container" class="space-y-2">
+                    <div class="flex gap-2 items-center item-row">
+                        <input type="text" placeholder="Nama Barang" class="item-nama flex-1 !mb-0 !py-2">
+                        <input type="number" placeholder="Qty" class="item-qty w-16 !mb-0 !py-2 text-center" min="1" value="1">
+                        <input type="text" placeholder="Satuan" class="item-sat w-16 !mb-0 !py-2" value="Pcs">
+                        <button class="text-red-500 p-2" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="w-full bg-blue-600 hover:bg-blue-800 text-white font-black py-3 rounded-lg uppercase tracking-widest shadow-md transition-all" onclick="simpanDO()">💾 Simpan & Cetak</button>
+        </div>
+    </div>
+
+    <div id="p-print" class="page px-4 mt-5">
+        <div class="no-print flex gap-2 mb-4">
+            <button class="flex-1 bg-slate-500 text-white py-2 rounded font-bold" onclick="bukaTab('home')"><i class="fas fa-arrow-left"></i> Kembali</button>
+            <button class="flex-1 bg-blue-600 text-white py-2 rounded font-bold" onclick="window.print()"><i class="fas fa-print"></i> Cetak A4</button>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6" id="print-area">
+            <div class="print-header">
+                <div>
+                    <h1 class="print-title" id="pr-pt">NAMA PERUSAHAAN</h1>
+                    <p class="text-xs font-bold text-slate-500 mt-1">Sistem Logistik & Distribusi</p>
+                </div>
+                <div class="text-right">
+                    <h2 class="text-2xl font-black text-slate-800 tracking-wider">SURAT JALAN</h2>
+                    <p class="text-sm font-bold text-slate-600" id="pr-no">DO-000</p>
+                </div>
+            </div>
+
+            <div class="flex justify-between mb-6 text-[13px]">
+                <div class="w-1/2 pr-4">
+                    <div class="font-black text-slate-500 text-[10px] uppercase mb-1">Kepada Yth:</div>
+                    <div class="font-black text-base" id="pr-tujuan">PT Tujuan</div>
+                    <div id="pr-alamat" class="mt-1 leading-relaxed">Alamat Tujuan</div>
+                </div>
+                <div class="w-1/3">
+                    <table class="w-full text-[12px]">
+                        <tr><td class="font-bold py-1">Tanggal</td><td>: <span id="pr-tgl"></span></td></tr>
+                        <tr><td class="font-bold py-1">Driver</td><td>: <span id="pr-driver"></span></td></tr>
+                        <tr><td class="font-bold py-1">No. Polisi</td><td>: <span id="pr-nopol"></span></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <table class="print-table">
+                <thead>
+                    <tr>
+                        <th class="w-12 text-center">NO</th>
+                        <th>NAMA / DESKRIPSI BARANG</th>
+                        <th class="w-24 text-center">QTY</th>
+                        <th class="w-24 text-center">SATUAN</th>
+                    </tr>
+                </thead>
+                <tbody id="pr-items">
+                    </tbody>
+            </table>
+
+            <div class="flex justify-between items-end mt-10">
+                <div class="w-1/4 text-center">
+                    <div id="pr-qr" class="w-24 h-24 border-2 border-slate-800 p-1 mx-auto bg-cover bg-center"></div>
+                    <div class="text-[8px] font-black mt-1 tracking-widest uppercase">Scan Verifikasi</div>
+                </div>
+
+                <div class="flex w-3/4 justify-around">
+                    <div class="ttd-box">
+                        <p class="font-bold text-xs mb-8">Pengirim (Gudang)</p>
+                        <br><br>
+                        <p class="font-black text-sm border-t border-slate-400 pt-1" id="pr-admin">Admin</p>
+                    </div>
+                    <div class="ttd-box">
+                        <p class="font-bold text-xs mb-8">Driver / Kurir</p>
+                        <br><br>
+                        <p class="font-black text-sm border-t border-slate-400 pt-1" id="pr-driver-ttd">Driver</p>
+                    </div>
+                    <div class="ttd-box">
+                        <p class="font-bold text-xs">Penerima</p>
+                        <img id="pr-ttd-img" class="ttd-img" style="display:none;" src="">
+                        <div id="pr-ttd-space" style="height:60px;"></div>
+                        <p class="font-black text-sm border-t border-slate-400 pt-1" id="pr-tujuan-ttd">Tujuan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 mt-4 no-print" id="widget-ttd" style="display:none;">
+            <h3 class="font-black text-emerald-600 text-sm uppercase tracking-wide border-b border-slate-100 pb-2 mb-3"><i class="fas fa-pen-nib"></i> Tanda Tangan Penerima</h3>
+            <p class="text-xs text-slate-500 mb-2">Mintalah penerima menandatangani layar di bawah ini sebagai bukti serah terima (e-POD).</p>
+            <canvas id="sig-canvas"></canvas>
+            <div class="flex gap-2 mt-3">
+                <button class="flex-1 bg-slate-200 text-slate-700 py-2 rounded font-bold" onclick="clearCanvas()">Hapus Ulang</button>
+                <button class="flex-1 bg-emerald-600 text-white py-2 rounded font-bold" onclick="saveSignature()">Simpan & Selesai</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="p-seting" class="page px-4 mt-5">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+            <h3 class="font-black text-blue-900 text-sm uppercase tracking-wide border-b border-slate-100 pb-3 mb-4"><i class="fas fa-cogs"></i> Konfigurasi Sistem</h3>
+            <label>Nama Perusahaan / Gudang Pengirim</label>
+            <input type="text" id="set-pt" placeholder="PT. Logistik Maju Jaya" class="mb-4">
+            <label>Nama Admin / Kepala Gudang</label>
+            <input type="text" id="set-admin" placeholder="Budi Santoso">
+            <button class="w-full bg-blue-900 text-white font-bold py-3 rounded-lg mt-4" onclick="simpanSet()">UPDATE PENGATURAN</button>
+            
+            <hr class="my-6 border-slate-200">
+            <button class="w-full bg-red-600 text-white font-black py-3 rounded-lg uppercase" onclick="if(confirm('HAPUS SELURUH ARSIP SURAT JALAN?')) { localStorage.clear(); location.reload(); }">⚠️ Factory Reset</button>
+        </div>
+    </div>
+
+    <nav class="bottom-nav no-print">
+        <div class="nav-item active" onclick="bukaTab('home')"><i class="fas fa-chart-pie nav-icon"></i>DASHBOARD</div>
+        <div class="nav-item" onclick="bukaTab('form')"><i class="fas fa-file-invoice nav-icon"></i>BUAT DO</div>
+        <div class="nav-item" onclick="bukaTab('seting')"><i class="fas fa-sliders-h nav-icon"></i>SETING</div>
+    </nav>
+
+    <script>
+        // DATABASE
+        let db_do = JSON.parse(localStorage.getItem('sj_db')) || [];
+        let curViewId = null;
+
+        // TIME INIT
+        let now = new Date(); let offset = now.getTimezoneOffset() * 60000;
+        let localIso = new Date(now.getTime() - offset).toISOString().slice(0, 10);
+        document.getElementById('f-tgl').value = localIso;
+
+        // SETTINGS
+        function simpanSet() {
+            localStorage.setItem('sj_pt', document.getElementById('set-pt').value);
+            localStorage.setItem('sj_admin', document.getElementById('set-admin').value);
+            renderDash(); alert("Pengaturan tersimpan!");
+        }
+
+        // GENERATE DO NUMBER
+        function generateDO() {
+            let count = db_do.length + 1;
+            let dateStr = localIso.replace(/-/g, "");
+            document.getElementById('f-no').value = `DO-${dateStr}-${count.toString().padStart(3,'0')}`;
+        }
+
+        // DYNAMIC ITEMS
+        function addItemRow() {
+            const container = document.getElementById('item-container');
+            const row = document.createElement('div');
+            row.className = "flex gap-2 items-center item-row";
+            row.innerHTML = `
+                <input type="text" placeholder="Nama Barang" class="item-nama flex-1 !mb-0 !py-2">
+                <input type="number" placeholder="Qty" class="item-qty w-16 !mb-0 !py-2 text-center" min="1" value="1">
+                <input type="text" placeholder="Satuan" class="item-sat w-16 !mb-0 !py-2" value="Pcs">
+                <button class="text-red-500 p-2" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(row);
+        }
+
+        // SIMPAN SURAT JALAN
+        function simpanDO() {
+            let no = document.getElementById('f-no').value.trim();
+            let tgl = document.getElementById('f-tgl').value;
+            let tujuan = document.getElementById('f-tujuan').value.trim();
+            let alamat = document.getElementById('f-alamat').value.trim();
+            let driver = document.getElementById('f-driver').value.trim();
+            let nopol = document.getElementById('f-nopol').value.trim();
+
+            if(!no || !tujuan || !driver) return alert("Nomor DO, Tujuan, dan Driver wajib diisi!");
+
+            // Collect items
+            let items = [];
+            document.querySelectorAll('.item-row').forEach(row => {
+                let nm = row.querySelector('.item-nama').value.trim();
+                let q = parseInt(row.querySelector('.item-qty').value) || 0;
+                let s = row.querySelector('.item-sat').value.trim();
+                if(nm && q > 0) items.push({ nama: nm, qty: q, sat: s });
+            });
+
+            if(items.length === 0) return alert("Minimal isi 1 barang!");
+
+            let id = Date.now();
+            let data = { id, no, tgl, tujuan, alamat, driver, nopol, items, status: 'DIKIRIM', ttd: null };
+            
+            db_do.push(data);
+            localStorage.setItem('sj_db', JSON.stringify(db_do));
+            
+            // Reset Form
+            document.getElementById('f-no').value = ""; document.getElementById('f-tujuan').value = ""; document.getElementById('f-alamat').value = ""; document.getElementById('f-driver').value = ""; document.getElementById('f-nopol').value = "";
+            document.getElementById('item-container').innerHTML = `
+                <div class="flex gap-2 items-center item-row">
+                    <input type="text" placeholder="Nama Barang" class="item-nama flex-1 !mb-0 !py-2">
+                    <input type="number" placeholder="Qty" class="item-qty w-16 !mb-0 !py-2 text-center" min="1" value="1">
+                    <input type="text" placeholder="Satuan" class="item-sat w-16 !mb-0 !py-2" value="Pcs">
+                    <button class="text-red-500 p-2" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+                </div>
+            `;
+            
+            renderDash();
+            lihatPrint(id);
+        }
+
+        // VIEW & PRINT
+        function lihatPrint(id) {
+            let d = db_do.find(x => x.id === id); if(!d) return;
+            curViewId = id;
+
+            let pt = localStorage.getItem('sj_pt') || "GUDANG LOGISTIK PRO";
+            let admin = localStorage.getItem('sj_admin') || "Admin Gudang";
+
+            document.getElementById('pr-pt').innerText = pt.toUpperCase();
+            document.getElementById('pr-no').innerText = d.no;
+            document.getElementById('pr-tujuan').innerText = d.tujuan;
+            document.getElementById('pr-alamat').innerText = d.alamat;
+            
+            let p = d.tgl.split('-');
+            document.getElementById('pr-tgl').innerText = `${p[2]}/${p[1]}/${p[0]}`;
+            document.getElementById('pr-driver').innerText = d.driver;
+            document.getElementById('pr-nopol').innerText = d.nopol;
+            document.getElementById('pr-admin').innerText = admin;
+            document.getElementById('pr-driver-ttd').innerText = d.driver;
+            document.getElementById('pr-tujuan-ttd').innerText = d.tujuan;
+
+            // Render Items
+            let htmlItems = "";
+            d.items.forEach((it, i) => {
+                htmlItems += `<tr><td class="text-center font-bold">${i+1}</td><td class="font-bold">${it.nama}</td><td class="text-center font-bold text-lg">${it.qty}</td><td class="text-center">${it.sat}</td></tr>`;
+            });
+            document.getElementById('pr-items').innerHTML = htmlItems;
+
+            // QR Code Generator
+            let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=VERIFY:${d.no}_${d.tujuan.replace(/\s+/g, '')}`;
+            document.getElementById('pr-qr').style.backgroundImage = `url('${qrUrl}')`;
+
+            // Signature Logic
+            let imgTtd = document.getElementById('pr-ttd-img');
+            let spcTtd = document.getElementById('pr-ttd-space');
+            let widgetTtd = document.getElementById('widget-ttd');
+
+            if(d.status === 'SELESAI' && d.ttd) {
+                imgTtd.src = d.ttd; imgTtd.style.display = 'block'; spcTtd.style.display = 'none';
+                widgetTtd.style.display = 'none';
+            } else {
+                imgTtd.style.display = 'none'; spcTtd.style.display = 'block';
+                widgetTtd.style.display = 'block';
+                resizeCanvas(); // Init canvas size
+            }
+
+            bukaTab('print');
+        }
+
+        // --- CANVAS SIGNATURE PAD LOGIC ---
+        const canvas = document.getElementById('sig-canvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+
+        function resizeCanvas() {
+            // Adjust canvas size to match CSS internal size to avoid distortion
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width; canvas.height = rect.height;
+            ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX = e.clientX; let clientY = e.clientY;
+            if(e.touches && e.touches.length > 0) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; }
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+
+        function startDraw(e) { e.preventDefault(); isDrawing = true; let pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); }
+        function draw(e) { if(!isDrawing) return; e.preventDefault(); let pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); }
+        function stopDraw(e) { e.preventDefault(); isDrawing = false; }
+
+        canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', stopDraw); canvas.addEventListener('mouseout', stopDraw);
+        canvas.addEventListener('touchstart', startDraw, {passive: false}); canvas.addEventListener('touchmove', draw, {passive: false}); canvas.addEventListener('touchend', stopDraw, {passive: false});
+
+        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+        function saveSignature() {
+            if(!curViewId) return;
+            // Check if canvas is blank (simple check)
+            const blank = document.createElement('canvas'); blank.width = canvas.width; blank.height = canvas.height;
+            if(canvas.toDataURL() === blank.toDataURL()) return alert("Tanda tangan belum diisi!");
+
+            let dataUrl = canvas.toDataURL('image/png');
+            let idx = db_do.findIndex(x => x.id === curViewId);
+            if(idx > -1) {
+                db_do[idx].status = 'SELESAI'; db_do[idx].ttd = dataUrl;
+                localStorage.setItem('sj_db', JSON.stringify(db_do));
+                alert("Tanda tangan berhasil disimpan! Status Surat Jalan: SELESAI.");
+                lihatPrint(curViewId); // Reload view
+            }
+        }
+        // --- END CANVAS ---
+
+        function renderDash() {
+            document.getElementById('h-pt').innerText = localStorage.getItem('sj_pt') || "E-DELIVERY PRO";
+            document.getElementById('set-pt').value = localStorage.getItem('sj_pt') || "";
+            document.getElementById('set-admin').value = localStorage.getItem('sj_admin') || "";
+
+            document.getElementById('v-tot').innerText = db_do.length;
+            document.getElementById('v-done').innerText = db_do.filter(x => x.status === 'SELESAI').length;
+
+            let html = "";
+            if(db_do.length === 0) html = "<tr><td colspan='4' class='text-center p-5 text-slate-400 font-bold'>Belum ada pengiriman.</td></tr>";
+            
+            db_do.slice().sort((a,b)=>b.id-a.id).forEach(d => {
+                let badge = d.status === 'SELESAI' ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded text-[9px] font-black">SELESAI</span>' : '<span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-[9px] font-black">DIKIRIM</span>';
+                let p = d.tgl.split('-');
+                html += `<tr class="hover:bg-slate-50 transition-colors">
+                    <td class="p-3"><div class="font-black text-blue-900">${d.no}</div><div class="text-[9px] text-slate-500">${p[2]}/${p[1]}/${p[0]}</div></td>
+                    <td class="p-3 font-bold">${d.tujuan}</td>
+                    <td class="p-3 text-center">${badge}</td>
+                    <td class="p-3 text-center"><button class="bg-blue-100 text-blue-700 px-3 py-1 rounded font-bold text-[10px] hover:bg-blue-600 hover:text-white transition-colors" onclick="lihatPrint(${d.id})">Buka</button></td>
+                </tr>`;
+            });
+            document.getElementById('table-dash').innerHTML = html;
+        }
+
+        function bukaTab(id) {
+            document.querySelectorAll('.page, .nav-item').forEach(e => e.classList.remove('active'));
+            document.getElementById('p-'+id).classList.add('active');
+            let navs = document.querySelectorAll('.bottom-nav .nav-item');
+            navs.forEach(n => { if(n.getAttribute('onclick').includes(id)) n.classList.add('active'); });
+            window.scrollTo(0,0);
+        }
+
+        renderDash();
+    </script>
+</body>
+</html>
