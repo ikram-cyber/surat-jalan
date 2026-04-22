@@ -123,21 +123,40 @@
             </div>
 
             <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-4">
-                <div class="flex justify-between items-center mb-2">
+                <div class="flex justify-between items-center mb-3">
                     <div>
                         <label class="mb-0 text-blue-900">Daftar Barang Bawaan</label>
                         <p class="text-[9px] text-slate-500">Nilai (Rp) disembunyikan saat dicetak.</p>
                     </div>
-                    <button class="bg-blue-600 text-white px-2 py-1 rounded text-[10px] font-bold" onclick="addItemRow()"><i class="fas fa-plus"></i> Tambah</button>
+                    <button class="bg-blue-600 text-white px-3 py-1.5 rounded text-[10px] font-bold shadow-sm" onclick="addItemRow()"><i class="fas fa-plus"></i> Tambah</button>
                 </div>
-                <div id="item-container" class="space-y-2">
-                    <div class="flex gap-2 items-center item-row">
-                        <input type="text" placeholder="Nama Barang" class="item-nama flex-[2] !mb-0 !py-2">
-                        <input type="number" placeholder="Qty" class="item-qty w-14 !mb-0 !py-2 text-center" min="1" value="1">
-                        <input type="text" placeholder="Satuan" class="item-sat w-14 !mb-0 !py-2" value="Pcs">
-                        <input type="number" placeholder="Nilai/Harga" class="item-nilai flex-1 !mb-0 !py-2 text-right">
-                        <button class="text-red-500 p-2" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+                
+                <div id="item-container" class="space-y-3">
+                    
+                    <div class="item-row bg-white p-3 rounded-lg border border-slate-200 shadow-sm relative">
+                        <button class="absolute top-2 right-2 text-red-500 p-2 hover:bg-red-50 rounded" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>
+                        
+                        <label class="text-[10px] text-slate-500 mb-1">Nama Barang / Deskripsi</label>
+                        <div class="pr-8 mb-2">
+                            <input type="text" placeholder="Contoh: Semen Gresik 50kg" class="item-nama w-full !mb-0 !py-2">
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="text-[10px] text-slate-500 mb-1">Qty</label>
+                                <input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-2 text-center font-bold" min="1" value="1">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-500 mb-1">Satuan</label>
+                                <input type="text" placeholder="Pcs/Kg" class="item-sat w-full !mb-0 !py-2 text-center" value="Pcs">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-500 mb-1">Nilai (Rp)</label>
+                                <input type="number" placeholder="Rp" class="item-nilai w-full !mb-0 !py-2 text-right">
+                            </div>
+                        </div>
                     </div>
+                    
                 </div>
             </div>
 
@@ -262,18 +281,42 @@
             document.getElementById('f-no').value = `DO-${dateStr}-${count.toString().padStart(3,'0')}`;
         }
 
+        // Tampilan baru: Item Card Block
         function addItemRow() {
             const container = document.getElementById('item-container');
             const row = document.createElement('div');
-            row.className = "flex gap-2 items-center item-row";
+            row.className = "item-row bg-white p-3 rounded-lg border border-slate-200 shadow-sm relative";
             row.innerHTML = `
-                <input type="text" placeholder="Nama Barang" class="item-nama flex-[2] !mb-0 !py-2">
-                <input type="number" placeholder="Qty" class="item-qty w-14 !mb-0 !py-2 text-center" min="1" value="1">
-                <input type="text" placeholder="Satuan" class="item-sat w-14 !mb-0 !py-2" value="Pcs">
-                <input type="number" placeholder="Nilai/Harga" class="item-nilai flex-1 !mb-0 !py-2 text-right">
-                <button class="text-red-500 p-2" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <button class="absolute top-2 right-2 text-red-500 p-2 hover:bg-red-50 rounded" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>
+                <label class="text-[10px] text-slate-500 mb-1">Nama Barang / Deskripsi</label>
+                <div class="pr-8 mb-2">
+                    <input type="text" placeholder="Contoh: Semen Gresik 50kg" class="item-nama w-full !mb-0 !py-2">
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="text-[10px] text-slate-500 mb-1">Qty</label>
+                        <input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-2 text-center font-bold" min="1" value="1">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-500 mb-1">Satuan</label>
+                        <input type="text" placeholder="Pcs/Kg" class="item-sat w-full !mb-0 !py-2 text-center" value="Pcs">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-500 mb-1">Nilai (Rp)</label>
+                        <input type="number" placeholder="Rp" class="item-nilai w-full !mb-0 !py-2 text-right">
+                    </div>
+                </div>
             `;
             container.appendChild(row);
+        }
+
+        function hapusBaris(btn) {
+            let rows = document.querySelectorAll('.item-row');
+            if(rows.length > 1) {
+                btn.parentElement.remove();
+            } else {
+                alert("Minimal harus ada 1 barang di Surat Jalan!");
+            }
         }
 
         function simpanDO() {
@@ -295,7 +338,7 @@
                 if(nm && q > 0) items.push({ nama: nm, qty: q, sat: s, nilai: v });
             });
 
-            if(items.length === 0) return alert("Minimal isi 1 barang!");
+            if(items.length === 0) return alert("Minimal isi 1 barang yang valid!");
 
             let id = Date.now();
             let data = { id, no, tgl, tujuan, alamat, driver, nopol, items, status: 'DIKIRIM' };
@@ -303,15 +346,29 @@
             db_do.push(data);
             localStorage.setItem('sj_db', JSON.stringify(db_do));
             
-            // Reset Form
+            // Reset Form & Item Container back to 1 empty block
             document.getElementById('f-no').value = ""; document.getElementById('f-tujuan').value = ""; document.getElementById('f-alamat').value = ""; document.getElementById('f-driver').value = ""; document.getElementById('f-nopol').value = "";
             document.getElementById('item-container').innerHTML = `
-                <div class="flex gap-2 items-center item-row">
-                    <input type="text" placeholder="Nama Barang" class="item-nama flex-[2] !mb-0 !py-2">
-                    <input type="number" placeholder="Qty" class="item-qty w-14 !mb-0 !py-2 text-center" min="1" value="1">
-                    <input type="text" placeholder="Satuan" class="item-sat w-14 !mb-0 !py-2" value="Pcs">
-                    <input type="number" placeholder="Nilai/Harga" class="item-nilai flex-1 !mb-0 !py-2 text-right">
-                    <button class="text-red-500 p-2" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+                <div class="item-row bg-white p-3 rounded-lg border border-slate-200 shadow-sm relative">
+                    <button class="absolute top-2 right-2 text-red-500 p-2 hover:bg-red-50 rounded" onclick="hapusBaris(this)"><i class="fas fa-times"></i></button>
+                    <label class="text-[10px] text-slate-500 mb-1">Nama Barang / Deskripsi</label>
+                    <div class="pr-8 mb-2">
+                        <input type="text" placeholder="Contoh: Semen Gresik 50kg" class="item-nama w-full !mb-0 !py-2">
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-[10px] text-slate-500 mb-1">Qty</label>
+                            <input type="number" placeholder="Qty" class="item-qty w-full !mb-0 !py-2 text-center font-bold" min="1" value="1">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-500 mb-1">Satuan</label>
+                            <input type="text" placeholder="Pcs/Kg" class="item-sat w-full !mb-0 !py-2 text-center" value="Pcs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-500 mb-1">Nilai (Rp)</label>
+                            <input type="number" placeholder="Rp" class="item-nilai w-full !mb-0 !py-2 text-right">
+                        </div>
+                    </div>
                 </div>
             `;
             
@@ -360,7 +417,7 @@
             bukaTab('print');
         }
 
-        // TANDAI MANUAL SELESAI (TANPA GPS)
+        // TANDAI MANUAL SELESAI
         function tandaiSelesai(id) {
             if(confirm("Tandai Surat Jalan ini sudah selesai/diterima tujuan?")) {
                 let idx = db_do.findIndex(x => x.id === id);
@@ -384,11 +441,10 @@
             document.getElementById('v-tot').innerText = countAll;
             document.getElementById('v-done').innerText = countDone;
 
-            // ERP IN-TRANSIT VALUATION (BUG FIXED)
+            // ERP IN-TRANSIT VALUATION
             let valJalan = 0;
             let valDone = 0;
             db_do.forEach(d => {
-                // Gunakan || 0 untuk mengamankan data lama yang tidak punya properti .nilai
                 let totalDO = d.items.reduce((sum, it) => sum + ((it.qty || 0) * (it.nilai || 0)), 0);
                 if(d.status === 'SELESAI') valDone += totalDO; else valJalan += totalDO;
             });
