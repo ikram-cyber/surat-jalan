@@ -197,6 +197,8 @@
         </div>
     </div>
 
+    <div class="text-center p-5 text-slate-400 text-[11px] font-bold tracking-widest mb-2 no-print">&copy; 2026 Ikram Cyber System</div>
+
     <nav class="bottom-nav no-print">
         <div class="nav-item active" onclick="bukaTab('home')"><i class="fas fa-chart-pie nav-icon"></i>DASHBOARD</div>
         <div class="nav-item" onclick="bukaTab('form')"><i class="fas fa-file-invoice nav-icon"></i>BUAT DO</div>
@@ -264,7 +266,6 @@
             if(items.length === 0) return alert("Minimal isi 1 barang!");
 
             let id = Date.now();
-            // Tidak ada lagi nyimpan gambar TTD, cukup status aja.
             let data = { id, no, tgl, tujuan, alamat, driver, nopol, items, status: 'DIKIRIM' };
             
             db_do.push(data);
